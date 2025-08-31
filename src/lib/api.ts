@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://139.59.22.16";
 
 async function handleResponse<T>(response: Response): Promise<T> {
   const json = await response.json();

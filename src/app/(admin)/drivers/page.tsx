@@ -1,23 +1,20 @@
-import ComponentCard from "@/components/common/ComponentCard";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import BasicTableOne from "@/components/tables/BasicTableOne";
+import DriverTable from "@/components/drivers/Table";
 import { Metadata } from "next";
 import React from "react";
 
 export const metadata: Metadata = {
-  title: "Tes Petrolium | Машин",
+  title: "Tes Petrolium | Жолооч",
   description:
-    "Tes Petrolium | Машин",
+    "Tes Petrolium | Жолооч",
 };
 
 export default function BasicTables() {
   return (
     <div>
-      <PageBreadcrumb pageTitle="Basic Table" />
+      <PageBreadcrumb pageTitle="Жолооч" />
       <div className="space-y-6">
-        <ComponentCard title="Basic Table 1">
-          <BasicTableOne />
-        </ComponentCard>
+        <DriverTable />
       </div>
     </div>
   );

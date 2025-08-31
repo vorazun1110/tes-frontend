@@ -9,7 +9,8 @@ import {
   Truck,
   User,
   GaugeCircle,
-  MapPin
+  MapPin,
+  Fuel
 } from "lucide-react";
 import { useSidebar } from "../context/SidebarContext";
 import {
@@ -30,6 +31,11 @@ const navItems: NavItem[] = [
     icon: <LayoutDashboard />,
     name: "Нүүр",
     path: "/",
+  },
+  {
+    icon: <Fuel />,
+    name: "Түгээлт",
+    path: "/deliveries",
   },
   {
     icon: <Users />,

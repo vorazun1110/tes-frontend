@@ -1,5 +1,6 @@
 "use client";
-import React, { useState } from "react";
+
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Table,
   TableBody,
@@ -7,357 +8,206 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-
+import { User, UserPayload } from "@/types/api";
 import Badge from "../ui/badge/Badge";
-import Image from "next/image";
-import Button from "../ui/button/Button";
-import { ChevronDownIcon, EyeCloseIcon, EyeIcon, PencilIcon, TrashBinIcon, TimeIcon } from "@/icons";
+import { Input } from "../ui/input";
+import Pagination from "../ui/pagination";
 import Modal from "../modal/BasicModal";
-import Label from "../form/Label";
-import ComponentCard from "../common/ComponentCard";
-import Input from "../form/input/InputField";
-import Select from "../form/Select";
-import DatePicker from "../form/date-picker";
-
-interface Order {
-  id: number;
-  user: {
-    image: string;
-    name: string;
-    role: string;
-  };
-  projectName: string;
-  team: {
-    images: string[];
-  };
-  status: string;
-  budget: string;
-}
-
-// Define the table data using the interface
-const tableData: Order[] = [
-  {
-    id: 1,
-    user: {
-      image: "/images/user/user-17.jpg",
-      name: "Lindsey Curtis",
-      role: "Web Designer",
-    },
-    projectName: "Agency Website",
-    team: {
-      images: [
-        "/images/user/user-22.jpg",
-        "/images/user/user-23.jpg",
-        "/images/user/user-24.jpg",
-      ],
-    },
-    budget: "3.9K",
-    status: "Active",
-  },
-  {
-    id: 2,
-    user: {
-      image: "/images/user/user-18.jpg",
-      name: "Kaiya George",
-      role: "Project Manager",
-    },
-    projectName: "Technology",
-    team: {
-      images: ["/images/user/user-25.jpg", "/images/user/user-26.jpg"],
-    },
-    budget: "24.9K",
-    status: "Pending",
-  },
-  {
-    id: 3,
-    user: {
-      image: "/images/user/user-17.jpg",
-      name: "Zain Geidt",
-      role: "Content Writing",
-    },
-    projectName: "Blog Writing",
-    team: {
-      images: ["/images/user/user-27.jpg"],
-    },
-    budget: "12.7K",
-    status: "Active",
-  },
-  {
-    id: 4,
-    user: {
-      image: "/images/user/user-20.jpg",
-      name: "Abram Schleifer",
-      role: "Digital Marketer",
-    },
-    projectName: "Social Media",
-    team: {
-      images: [
-        "/images/user/user-28.jpg",
-        "/images/user/user-29.jpg",
-        "/images/user/user-30.jpg",
-      ],
-    },
-    budget: "2.8K",
-    status: "Cancel",
-  },
-  {
-    id: 5,
-    user: {
-      image: "/images/user/user-21.jpg",
-      name: "Carla George",
-      role: "Front-end Developer",
-    },
-    projectName: "Website",
-    team: {
-      images: [
-        "/images/user/user-31.jpg",
-        "/images/user/user-32.jpg",
-        "/images/user/user-33.jpg",
-      ],
-    },
-    budget: "4.5K",
-    status: "Active",
-  },
-];
-
+import Button from "@/components/ui/button/Button";
+import { Pencil, Trash2 } from "lucide-react";
+import { useConfirmDialog } from "@/hooks/useConfirmDialog";
+import ConfirmDialog from "../ui/modal/ConfirmDialog";
+import { createUser, deleteUser, fetchUsers, updateUser } from "@/services/user";
+import UserFormModal from "./Modal";
 
 export default function UserTable() {
-  const [open, setOpen] = useState(false);
+  const [users, setUsers] = useState<User[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editUser, setEditUser] = useState<User | null>(null);
+  const {
+    isOpen: isConfirmOpen,
+    confirm: openConfirm,
+    options: confirmOptions,
+    handleClose: closeConfirm,
+    handleConfirm: confirmDelete,
+  } = useConfirmDialog();
 
-  const [showPassword, setShowPassword] = useState(false);
-  const options = [
-    { value: "marketing", label: "Marketing" },
-    { value: "template", label: "Template" },
-    { value: "development", label: "Development" },
-  ];
-  const handleSelectChange = (value: string) => {
-    console.log("Selected value:", value);
+  const rowsPerPage = 5;
+
+  useEffect(() => {
+    fetchUsers()
+      .then((res) => setUsers(res.data))
+      .catch((err) => setError(err.message));
+  }, []);
+
+  const filteredUsers = useMemo(() => {
+    return users.filter((user) =>
+      user.username.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [users, search]);
+
+  const paginatedUsers = useMemo(() => {
+    const start = (currentPage - 1) * rowsPerPage;
+    return filteredUsers.slice(start, start + rowsPerPage);
+  }, [filteredUsers, currentPage]);
+
+  const totalPages = Math.ceil(filteredUsers.length / rowsPerPage);
+
+  const handleSubmit = async (payload: UserPayload) => {
+    try {
+      if (editUser) {
+        const res = await updateUser(editUser.id, payload);
+        setUsers((prev) =>
+          prev.map((d) => (d.id === editUser.id ? res.data : d))
+        );
+      } else {
+        const res = await createUser(payload);
+        setUsers((prev) => [res.data, ...prev]);
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unknown error occurred");
+      }
+    } finally {
+      setIsModalOpen(false);
+      setEditUser(null);
+    }
   };
-  
+
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteUser(id);
+      setUsers((prev) => prev.filter((d) => d.id !== id));
+    } catch (err: unknown) {
+      if (err instanceof Error) setError(err.message);
+      else setError("An unknown error occurred");
+    }
+  };
+
+
+
   return (
-    <>
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
-        {/* Top-right Add Button */}
-        <div className="flex items-center justify-between px-5 py-4 sm:px-6">
-          <h2 className="text-base font-semibold text-gray-800 dark:text-white">
-            Users
-          </h2>
-          <Button size="sm" variant="primary" onClick={() => setOpen(true)}>
-            + Хэрэглэгч нэмэх
-          </Button>
-        </div>
-
-        <div className="max-w-full overflow-x-auto">
-          <div className="min-w-[1102px]">
-            <Table>
-              <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
-                <TableRow>
-                  <TableCell isHeader className="px-5 py-3 text-start text-theme-xs font-medium text-gray-500 dark:text-gray-400">
-                    User
-                  </TableCell>
-                  <TableCell isHeader className="px-5 py-3 text-start text-theme-xs font-medium text-gray-500 dark:text-gray-400">
-                    Project Name
-                  </TableCell>
-                  <TableCell isHeader className="px-5 py-3 text-start text-theme-xs font-medium text-gray-500 dark:text-gray-400">
-                    Team
-                  </TableCell>
-                  <TableCell isHeader className="px-5 py-3 text-start text-theme-xs font-medium text-gray-500 dark:text-gray-400">
-                    Status
-                  </TableCell>
-                  <TableCell isHeader className="px-5 py-3 text-start text-theme-xs font-medium text-gray-500 dark:text-gray-400">
-                    Budget
-                  </TableCell>
-                  <TableCell isHeader className="px-5 py-3 text-start text-theme-xs font-medium text-gray-500 dark:text-gray-400">
-                    Actions
-                  </TableCell>
-                </TableRow>
-              </TableHeader>
-
-              <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                {tableData.map((order) => (
-                  <TableRow key={order.id}>
-                    <TableCell className="px-5 py-4 sm:px-6 text-start">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 overflow-hidden rounded-full">
-                          <Image
-                            width={40}
-                            height={40}
-                            src={order.user.image}
-                            alt={order.user.name}
-                          />
-                        </div>
-                        <div>
-                          <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                            {order.user.name}
-                          </span>
-                          <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
-                            {order.user.role}
-                          </span>
-                        </div>
-                      </div>
+    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+      <div className="p-4 flex justify-between items-center">
+        <Input
+          type="text"
+          placeholder="Нэвтрэх нэр хайх..."
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setCurrentPage(1);
+          }}
+          className="w-full max-w-sm"
+        />
+        <Button className="ml-4" onClick={() => { setEditUser(null); setIsModalOpen(true); }}>
+          + Нэмэх
+        </Button>
+      </div>
+      <div className="max-w-full overflow-x-auto">
+        <div className="min-w-[800px]">
+          <Table>
+            <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
+              <TableRow>
+                <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">#</TableCell>
+                <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Нэвтрэх нэр</TableCell>
+                <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Үүрэг</TableCell>
+                <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Нэр</TableCell>
+                <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Овог</TableCell>
+                <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Үйлдэл</TableCell>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+              {paginatedUsers.map((user, index) => {
+                return (
+                  <TableRow key={user.id} className="hover:bg-gray-700">
+                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                      <Badge color="primary">{(currentPage - 1) * rowsPerPage + index + 1}</Badge>
                     </TableCell>
-                    <TableCell className="px-4 py-3 text-start text-theme-sm text-gray-500 dark:text-gray-400">
-                      {order.projectName}
+                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                      <Badge color="primary">{user.username}</Badge>
                     </TableCell>
-                    <TableCell className="px-4 py-3 text-start text-theme-sm text-gray-500 dark:text-gray-400">
-                      <div className="flex -space-x-2">
-                        {order.team.images.map((img, idx) => (
-                          <div
-                            key={idx}
-                            className="w-6 h-6 overflow-hidden border-2 border-white rounded-full dark:border-gray-900"
-                          >
-                            <Image
-                              width={24}
-                              height={24}
-                              src={img}
-                              alt={`Team member ${idx + 1}`}
-                              className="w-full"
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </TableCell>
-                    <TableCell className="px-4 py-3 text-start text-theme-sm text-gray-500 dark:text-gray-400">
+                    <TableCell className="px-5 py-4 text-start text-theme-sm">
                       <Badge
                         size="sm"
                         color={
-                          order.status === "Active"
+                          user.role === "manager"
                             ? "success"
-                            : order.status === "Pending"
+                            : user.role === "inspector"
                               ? "warning"
                               : "error"
                         }
                       >
-                        {order.status}
+                        {user.role}
                       </Badge>
                     </TableCell>
-                    <TableCell className="px-4 py-3 text-theme-sm text-gray-500 dark:text-gray-400">
-                      {order.budget}
+                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                      <Badge color="primary">{user.firstname}</Badge>
                     </TableCell>
-                    {/* New Action Column */}
-                    <TableCell className="px-4 py-3 text-start">
-                      <div className="flex items-center gap-2">
+                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                      <Badge color="primary">{user.lastname}</Badge>
+                    </TableCell>
+                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                      <div className="flex gap-2">
                         <button
-                          className="text-gray-500 hover:text-blue-600 dark:hover:text-blue-400"
-                          aria-label="Edit"
+                          onClick={() => {
+                            setEditUser(user);
+                            setIsModalOpen(true);
+                          }}
+                          className="text-blue-600 hover:text-blue-800"
                         >
-                          <PencilIcon className="w-4 h-4" />
+                          <Pencil size={18} />
                         </button>
                         <button
-                          className="text-gray-500 hover:text-red-600 dark:hover:text-red-400"
-                          aria-label="Delete"
+                          onClick={() => {
+                            openConfirm(() => handleDelete(user.id), {
+                              title: "Мэдээлэл устгах",
+                              description: `"${user.firstname} ${user.lastname}" нэртэй жолоочыг устгах уу?`,
+                              confirmText: "Устгах",
+                              cancelText: "Цуцлах",
+                            });
+                          }}
+                          className="text-red-600 hover:text-red-800"
                         >
-                          <TrashBinIcon className="w-4 h-4" />
+                          <Trash2 size={18} />
                         </button>
                       </div>
                     </TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                );
+              })}
+            </TableBody>
+          </Table>
+          {error && (
+            <div className="p-4 text-red-500 font-medium text-sm">Error: {error}</div>
+          )}
+          <div className="flex justify-end p-4">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
           </div>
         </div>
       </div>
-      <Modal isOpen={open} onClose={() => setOpen(false)}>
-      <ComponentCard title="Default Inputs">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div>
-          <Label>Input</Label>
-          <Input type="text" />
-        </div>
-        <div>
-          <Label>Input with Placeholder</Label>
-          <Input type="text" placeholder="info@gmail.com" />
-        </div>
-        <div>
-          <Label>Select Input</Label>
-          <div className="relative">
-            <Select
-            options={options}
-            placeholder="Select an option"
-            onChange={handleSelectChange}
-            className="dark:bg-dark-900"
-          />
-             <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
-              <ChevronDownIcon/>
-            </span>
-          </div>
-        </div>
-        <div>
-          <Label>Password Input</Label>
-          <div className="relative">
-            <Input
-              type={showPassword ? "text" : "password"}
-              placeholder="Enter your password"
-            />
-            <button
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
-            >
-              {showPassword ? (
-                <EyeIcon className="fill-gray-500 dark:fill-gray-400" />
-              ) : (
-                <EyeCloseIcon className="fill-gray-500 dark:fill-gray-400" />
-              )}
-            </button>
-          </div>
-        </div>
 
-        <div>
-          <DatePicker
-            id="date-picker"
-            label="Date Picker Input"
-            placeholder="Select a date"
-            onChange={(dates, currentDateString) => {
-              // Handle your logic
-              console.log({ dates, currentDateString });
-            }}
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="tm">Time Picker Input</Label>
-          <div className="relative">
-            <Input
-              type="time"
-              id="tm"
-              name="tm"
-              onChange={(e) => console.log(e.target.value)}
-            />
-            <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
-              <TimeIcon />
-            </span>
-          </div>
-        </div>
-        <div>
-          <Label htmlFor="tm">Input with Payment</Label>
-          <div className="relative">
-            <Input
-              type="text"
-              placeholder="Card number"
-              className="pl-[62px]"
-            />
-            <span className="absolute left-0 top-1/2 flex h-11 w-[46px] -translate-y-1/2 items-center justify-center border-r border-gray-200 dark:border-gray-800">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <circle cx="6.25" cy="10" r="5.625" fill="#E80B26" />
-                <circle cx="13.75" cy="10" r="5.625" fill="#F59D31" />
-                <path
-                  d="M10 14.1924C11.1508 13.1625 11.875 11.6657 11.875 9.99979C11.875 8.33383 11.1508 6.8371 10 5.80713C8.84918 6.8371 8.125 8.33383 8.125 9.99979C8.125 11.6657 8.84918 13.1625 10 14.1924Z"
-                  fill="#FC6020"
-                />
-              </svg>
-            </span>
-          </div>
-        </div>
-      </div>
-      </ComponentCard>
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <UserFormModal
+          editUser={editUser}
+          onClose={() => setIsModalOpen(false)}
+          onSubmit={handleSubmit}
+        />
       </Modal>
-    </>
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        onClose={closeConfirm}
+        onConfirm={confirmDelete}
+        {...confirmOptions}
+      />
+    </div>
   );
 }

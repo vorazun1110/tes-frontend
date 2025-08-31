@@ -8,25 +8,25 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { Truck, TruckPayload } from "@/types/api";
-import { createTruck, deleteTruck, fetchTrucks, updateTruck } from "@/services/truck";
+import { Volume } from "@/types/api";
 import Badge from "../ui/badge/Badge";
 import { Input } from "../ui/input";
 import Pagination from "../ui/pagination";
 import Modal from "../modal/BasicModal";
 import Button from "@/components/ui/button/Button";
 import { Pencil, Trash2 } from "lucide-react";
-import TruckFormModal from "./Modal";
 import { useConfirmDialog } from "@/hooks/useConfirmDialog";
 import ConfirmDialog from "../ui/modal/ConfirmDialog";
+import { createVolume, deleteVolume, fetchVolumes, updateVolume } from "@/services/volume";
+import VolumeFormModal from "./Modal";
 
-export default function TruckTable() {
-  const [trucks, setTrucks] = useState<Truck[]>([]);
+export default function VolumeTable() {
+  const [volumes, setVolumes] = useState<Volume[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editTruck, setEditTruck] = useState<Truck | null>(null);
+  const [editVolume, setEditVolume] = useState<Volume | null>(null);
   const {
     isOpen: isConfirmOpen,
     confirm: openConfirm,
@@ -38,34 +38,34 @@ export default function TruckTable() {
   const rowsPerPage = 5;
 
   useEffect(() => {
-    fetchTrucks()
-      .then((res) => setTrucks(res.data))
+    fetchVolumes()
+      .then((res) => setVolumes(res.data))
       .catch((err) => setError(err.message));
   }, []);
 
-  const filteredTrucks = useMemo(() => {
-    return trucks.filter((truck) =>
-      truck.license_plate.toLowerCase().includes(search.toLowerCase())
+  const filteredVolumes = useMemo(() => {
+    return volumes.filter((volume) =>
+      volume.value.toString().includes(search)
     );
-  }, [trucks, search]);
+  }, [volumes, search]);
 
-  const paginatedTrucks = useMemo(() => {
+  const paginatedVolumes = useMemo(() => {
     const start = (currentPage - 1) * rowsPerPage;
-    return filteredTrucks.slice(start, start + rowsPerPage);
-  }, [filteredTrucks, currentPage]);
+    return filteredVolumes.slice(start, start + rowsPerPage);
+  }, [filteredVolumes, currentPage]);
 
-  const totalPages = Math.ceil(filteredTrucks.length / rowsPerPage);
+  const totalPages = Math.ceil(filteredVolumes.length / rowsPerPage);
 
-  const handleSubmit = async (payload: TruckPayload) => {
+  const handleSubmit = async (payload: Volume) => {
     try {
-      if (editTruck) {
-        const res = await updateTruck(editTruck.id, payload);
-        setTrucks((prev) =>
-          prev.map((t) => (t.id === editTruck.id ? res.data : t))
+      if (editVolume) {
+        const res = await updateVolume(editVolume.id, payload);
+        setVolumes((prev) =>
+          prev.map((d) => (d.id === editVolume.id ? res.data : d))
         );
       } else {
-        const res = await createTruck(payload);
-        setTrucks((prev) => [res.data, ...prev]);
+        const res = await createVolume(payload);
+        setVolumes((prev) => [res.data, ...prev]);
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -75,14 +75,14 @@ export default function TruckTable() {
       }
     } finally {
       setIsModalOpen(false);
-      setEditTruck(null);
+      setEditVolume(null);
     }
   };
 
   const handleDelete = async (id: number) => {
     try {
-      await deleteTruck(id);
-      setTrucks((prev) => prev.filter((t) => t.id !== id));
+      await deleteVolume(id);
+      setVolumes((prev) => prev.filter((d) => d.id !== id));
     } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);
       else setError("An unknown error occurred");
@@ -96,7 +96,7 @@ export default function TruckTable() {
       <div className="p-4 flex justify-between items-center">
         <Input
           type="text"
-          placeholder="Улсын дугаар хайх..."
+          placeholder="Утга хайх..."
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
@@ -104,7 +104,7 @@ export default function TruckTable() {
           }}
           className="w-full max-w-sm"
         />
-        <Button className="ml-4" onClick={() => { setEditTruck(null); setIsModalOpen(true); }}>
+        <Button className="ml-4" onClick={() => { setEditVolume(null); setIsModalOpen(true); }}>
           + Нэмэх
         </Button>
       </div>
@@ -114,44 +114,25 @@ export default function TruckTable() {
             <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
               <TableRow>
                 <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">#</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Төрөл</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Улсын дугаар</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Чингэлэгийн тоо</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Нийт хэмжээ</TableCell>
+                <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Утга</TableCell>
                 <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Үйлдэл</TableCell>
               </TableRow>
             </TableHeader>
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-              {paginatedTrucks.map((truck, index) => {
-                const color = truck.type === 'truck' ? 'primary' : 'warning';
-                const containerCount = truck.containers ? truck.containers.length : 0;
-                const totalVolume = truck.containers ? truck.containers.reduce(
-                  (sum, c) => sum + (c.volume || 0),
-                  0
-                ) : 0;
-
+              {paginatedVolumes.map((volume, index) => {
                 return (
-                  <TableRow key={truck.id} className="hover:bg-gray-700">
+                  <TableRow key={volume.id} className="hover:bg-gray-700">
                     <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      <Badge color={color}>{(currentPage - 1) * rowsPerPage + index + 1}</Badge>
+                      <Badge color="primary">{(currentPage - 1) * rowsPerPage + index + 1}</Badge>
                     </TableCell>
                     <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      <Badge color={color}>{truck.type === 'truck' ? 'Ачилтын машин' : 'Чиргүүл'}</Badge>
-                    </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      <Badge color={color}>{truck.license_plate}</Badge>
-                    </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      <Badge color={color}>{containerCount} ш</Badge>
-                    </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      <Badge color={color}>{totalVolume.toLocaleString()} л</Badge>
+                      <Badge color="primary">{volume.value}</Badge>
                     </TableCell>
                     <TableCell className="px-5 py-4 text-start text-theme-sm">
                       <div className="flex gap-2">
                         <button
                           onClick={() => {
-                            setEditTruck(truck);
+                            setEditVolume(volume);
                             setIsModalOpen(true);
                           }}
                           className="text-blue-600 hover:text-blue-800"
@@ -160,9 +141,9 @@ export default function TruckTable() {
                         </button>
                         <button
                           onClick={() => {
-                            openConfirm(() => handleDelete(truck.id), {
+                            openConfirm(() => handleDelete(volume.id), {
                               title: "Мэдээлэл устгах",
-                              description: `"${truck.license_plate}" дугаартай машиныг устгах уу?`,
+                              description: `"${volume.value}" утгатай ачилтын хэмжээг устгах уу?`,
                               confirmText: "Устгах",
                               cancelText: "Цуцлах",
                             });
@@ -192,8 +173,8 @@ export default function TruckTable() {
       </div>
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <TruckFormModal
-          editTruck={editTruck}
+        <VolumeFormModal
+          editVolume={editVolume}
           onClose={() => setIsModalOpen(false)}
           onSubmit={handleSubmit}
         />

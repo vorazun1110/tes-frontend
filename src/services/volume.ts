@@ -17,5 +17,5 @@ export async function createVolume(payload: Partial<Volume>): Promise<ApiRespons
 }
 
 export async function deleteVolume(volumeId: number): Promise<ApiResponse<null>> {
-  return await apiAction<ApiResponse<null>>(`/volumes?id=${volumeId}`, "DELETE");
+  return await apiAction<ApiResponse<null>>(`/volumes/${volumeId}`, "DELETE");
 }

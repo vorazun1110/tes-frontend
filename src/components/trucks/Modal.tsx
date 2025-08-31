@@ -17,6 +17,7 @@ interface TruckFormModalProps {
 
 export default function TruckFormModal({ editTruck, onClose, onSubmit }: TruckFormModalProps) {
   const [licensePlate, setLicensePlate] = useState<string>("");
+  const [type, setType] = useState<"trailer" | "truck">("truck");
   const [containers, setContainers] = useState<{ volumeId: number }[]>([]);
   const [volumes, setVolumes] = useState<Volume[]>([]);
 
@@ -28,14 +29,16 @@ export default function TruckFormModal({ editTruck, onClose, onSubmit }: TruckFo
     if (editTruck) {
       setLicensePlate(editTruck.license_plate);
       setContainers(editTruck.containers.map((c) => ({ volumeId: c.id })));
+      setType(editTruck.type);
     } else {
       setLicensePlate("");
       setContainers([]);
+      setType("truck");
     }
   }, [editTruck]);
 
   const handleAddContainer = () => {
-    setContainers((prev) => [...prev, { volumeId: 0 }]);
+    setContainers((prev) => [...prev, { volumeId: volumes[0].id }]);
   };
 
   const handleChangeContainer = (index: number, volumeId: number) => {
@@ -50,9 +53,9 @@ export default function TruckFormModal({ editTruck, onClose, onSubmit }: TruckFo
 
   const handleSubmit = async () => {
     const payload: TruckPayload = {
-      type: "trailer",
+      type,
       licensePlate: licensePlate,
-      containers: containers.filter((c) => c.volumeId !== 0).map((c) => ({ volumeId: c.volumeId })),
+      containers: containers.map((c) => ({ volumeId: c.volumeId })),
     };
     await onSubmit(payload);
     onClose();
@@ -60,12 +63,12 @@ export default function TruckFormModal({ editTruck, onClose, onSubmit }: TruckFo
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold">
+      <h2 className="text-xl font-semibold text-white">
         {editTruck ? "Ачилтын машин засах" : "Ачилтын машин нэмэх"}
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="col-span-2">
+        <div className="md:col-span-1">
           <Label htmlFor="license-plate">Улсын дугаар</Label>
           <Input
             id="license-plate"
@@ -73,6 +76,14 @@ export default function TruckFormModal({ editTruck, onClose, onSubmit }: TruckFo
             placeholder="1234УБА"
             value={licensePlate}
             onChange={(e) => setLicensePlate(e.target.value)}
+          />
+        </div>
+        <div className="md:col-span-1">
+          <Label htmlFor="type">Төрөл</Label>
+          <Select
+            options={[{ value: "truck", label: "Ачилтын машин" }, { value: "trailer", label: "Чиргүүл" }]}
+            defaultValue={editTruck ? editTruck.type : "truck"}
+            onChange={(selected) => setType(selected as "trailer" | "truck")}
           />
         </div>
 
@@ -90,7 +101,6 @@ export default function TruckFormModal({ editTruck, onClose, onSubmit }: TruckFo
             >
               <Select
                 options={volumes.map((v) => ({ value: v.id.toString(), label: `${v.value} л` }))}
-                placeholder="Хэмжээ сонгох"
                 defaultValue={container.volumeId.toString()}
                 onChange={(selected) => handleChangeContainer(index, parseInt(selected))}
                 className="w-full dark:bg-dark-900"

@@ -1,20 +1,20 @@
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import LocationTable from "@/components/locations/Table";
+import DeliveryTable from "@/components/deliveries/Table";
 import { Metadata } from "next";
 import React from "react";
 
 export const metadata: Metadata = {
-  title: "Tes Petrolium | Түгээлтийн байршил",
+  title: "Tes Petrolium | Түгээлт",
   description:
-    "Tes Petrolium | Түгээлтийн байршил",
+    "Tes Petrolium | Түгээлт",
 };
 
 export default function BasicTables() {
   return (
     <div>
-      <PageBreadcrumb pageTitle="Түгээлтийн байршил" />
+      <PageBreadcrumb pageTitle="Түгээлт" />
       <div className="space-y-6">
-        <LocationTable />
+        <DeliveryTable />
       </div>
     </div>
   );

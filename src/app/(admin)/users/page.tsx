@@ -1,4 +1,3 @@
-import ComponentCard from "@/components/common/ComponentCard";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import UserTable from "@/components/users/Table";
 import { Metadata } from "next";
@@ -15,9 +14,7 @@ export default function BasicTables() {
     <div>
       <PageBreadcrumb pageTitle="Хэрэглэгч" />
       <div className="space-y-6">
-        <ComponentCard title="Хэрэглэгч">
-          <UserTable />
-        </ComponentCard>
+        <UserTable />
       </div>
     </div>
   );

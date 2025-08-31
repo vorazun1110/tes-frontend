@@ -17,5 +17,5 @@ export async function createTruck(payload: TruckPayload): Promise<ApiResponse<Tr
 }
 
 export async function deleteTruck(truckId: number): Promise<ApiResponse<null>> {
-  return await apiAction<ApiResponse<null>>(`/trucks?id=${truckId}`, "DELETE");
+  return await apiAction<ApiResponse<null>>(`/trucks/${truckId}`, "DELETE");
 }

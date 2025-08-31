@@ -9,7 +9,7 @@ export interface ConfirmDialogOptions {
 
 export function useConfirmDialog() {
   const [isOpen, setIsOpen] = useState(false);
-  const [onConfirm, setOnConfirm] = useState<() => void>(() => {});
+  const [onConfirm, setOnConfirm] = useState<() => void>(() => { });
   const [options, setOptions] = useState<ConfirmDialogOptions>({});
 
   const confirm = useCallback(
