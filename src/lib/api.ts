@@ -13,6 +13,7 @@ export async function apiGet<T>(endpoint: string): Promise<T> {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "zail",
     },
     cache: "no-store",
   });
@@ -28,6 +29,7 @@ export async function apiAction<T>(
     method,
     headers: {
       "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "zail",
     },
     body: JSON.stringify(body),
   });
