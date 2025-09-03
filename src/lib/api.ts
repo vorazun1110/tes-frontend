@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://139.59.22.16";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://skilled-stud-merely.ngrok-free.app";
 
 async function handleResponse<T>(response: Response): Promise<T> {
   const json = await response.json();
