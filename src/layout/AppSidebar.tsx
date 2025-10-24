@@ -10,7 +10,8 @@ import {
   User,
   GaugeCircle,
   MapPin,
-  Fuel
+  Fuel,
+  Timer
 } from "lucide-react";
 import { useSidebar } from "../context/SidebarContext";
 import {
@@ -39,17 +40,17 @@ const navItems: NavItem[] = [
   },
   {
     icon: <Users />,
-    name: "Хэрэглэгч",
+    name: "Апп хандалт",
     path: "/users",
   },
   {
     icon: <Truck />,
-    name: "Ачилтын машин",
+    name: "Тээврийн хэрэгслийн мэдээлэл",
     path: "/trucks",
   },
   {
     icon: <User />,
-    name: "Жолооч",
+    name: "Ажилтаны мэдээлэл",
     path: "/drivers",
   },
   {
@@ -59,8 +60,13 @@ const navItems: NavItem[] = [
   },
   {
     icon: <MapPin />,
-    name: "Түгээлтийн цэг",
+    name: "ШТС-ын байршил",
     path: "/fuel-locations",
+  },
+  {
+    icon: <Timer />,
+    name: "Цагийн бүртгэл",
+    path: "/report",
   },
 
 ];

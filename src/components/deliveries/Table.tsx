@@ -20,7 +20,7 @@ import ConfirmDialog from "../ui/modal/ConfirmDialog";
 import { createVolume, deleteVolume, fetchVolumes, updateVolume } from "@/services/volume";
 import VolumeFormModal from "./Modal";
 
-export default function VolumeTable() {
+export default function DeliveryTable() {
   const [volumes, setVolumes] = useState<Volume[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState<string>("");

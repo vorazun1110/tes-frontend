@@ -29,9 +29,6 @@ export default function AuthLayout({
                     alt="Logo"
                   />
                 </Link>
-                <p className="text-center text-gray-400 dark:text-white/60">
-                  Тэс Петролиум систем
-                </p>
               </div>
             </div>
           </div>

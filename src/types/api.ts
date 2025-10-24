@@ -120,3 +120,26 @@ export interface ApiResponse<T> {
     data: T;
 }
 
+export interface FuelTypeDetail {
+    id: number;
+    name: string;
+    volume: number;
+}
+
+export interface LocationDetail {
+    id: number;
+    name: string;
+}
+
+export interface ReportDelivery {
+    date: string;
+    tonKm: number;
+    withLoadDistance: number;
+    withoutLoadDistance: number;
+    locationDetail: LocationDetail | null;
+    fuelTypeDetail: FuelTypeDetail[];
+}
+
+export interface ReportResponse {
+    deliveries: ReportDelivery[];
+}

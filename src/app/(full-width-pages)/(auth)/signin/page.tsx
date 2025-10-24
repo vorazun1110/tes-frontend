@@ -2,8 +2,8 @@ import SignInForm from "@/components/auth/SignInForm";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Тэс Петролиум | Нэвтрэх",
-  description: "Тэс Петролиум | Нэвтрэх",
+  title: "Ти Эм Ойл Транс | Нэвтрэх",
+  description: "Ти Эм Ойл Транс | Нэвтрэх",
 };
 
 export default function SignIn() {
