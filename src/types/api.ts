@@ -1,23 +1,45 @@
 export interface Container {
-    id: number;
     volume: number | null;
 }
 
 export interface Truck {
     id: number;
-    type: "trailer" | "truck";
+    license_plate: string;
+    containers: Container[];
+    tire_wear: number;
+    last_battery_changed_at: string;
+    last_inspected_at: string;
+    driver?: Driver;
+    driver_id?: number | null;
+    trailer?: {
+        id: number;
+        license_plate: string;
+        containers: Container[];
+    }
+}
+
+export interface TruckPayload {
+    license_plate: string;
+    last_battery_changed_at: string;
+    last_inspected_at: string;
+    driver_id?: number | null;
+    tire_wear: number;
+    containers: ContainerPayload[];
+    trailer_id?: number | null;
+}
+
+export interface Trailer {
+    id: number;
     license_plate: string;
     containers: Container[];
 }
 
-export interface TruckPayload {
-    type: "trailer" | "truck";
-    licensePlate: string;
+export interface TrailerPayload {
+    license_plate: string;
     containers: ContainerPayload[];
 }
-
 export interface ContainerPayload {
-    volumeId: number;
+    volume: number;
 }
 
 export interface Volume {

@@ -25,12 +25,12 @@ export default function Modal({
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
-            onClick={onClose} // click backdrop closes modal
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-2"
+            onClick={onClose}
         >
             <div
-                className="bg-white dark:bg-gray-900 rounded-lg px-6 py-4 w-full max-w-2xl modal-scroll max-h-[80vh] overflow-y-auto shadow-lg relative"
-                onClick={(e) => e.stopPropagation()} // prevent close on modal content click
+                className="bg-white dark:bg-gray-900 rounded-lg w-full max-w-4xl overflow-y-auto overflow-x-hidden max-h-[90vh] shadow-xl relative px-4 md:px-6 py-6"
+                onClick={(e) => e.stopPropagation()}
             >
                 <button
                     onClick={onClose}

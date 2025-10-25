@@ -52,7 +52,7 @@ export default function ReportTable() {
 
       <div className="max-w-full overflow-x-auto">
         <div className="min-w-[1000px]">
-          <Table>
+          <Table className="dark:text-white">
             <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
               <TableRow>
                 <TableCell isHeader>#</TableCell>

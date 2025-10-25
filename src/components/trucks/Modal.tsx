@@ -5,9 +5,11 @@ import { Input } from "../ui/input";
 import Button from "../ui/button/Button";
 import Label from "../form/Label";
 import Select from "../form/Select";
-import { fetchVolumes } from "@/services/volume";
-import { Truck, TruckPayload, Volume } from "@/types/api";
+import { Driver, Trailer, Truck, TruckPayload } from "@/types/api";
 import { Trash2 } from "lucide-react";
+import { fetchTrailers } from "@/services/trailer";
+import { fetchDrivers } from "@/services/driver";
+import DatePicker from "../form/date-picker";
 
 interface TruckFormModalProps {
   editTruck: Truck | null;
@@ -17,33 +19,48 @@ interface TruckFormModalProps {
 
 export default function TruckFormModal({ editTruck, onClose, onSubmit }: TruckFormModalProps) {
   const [licensePlate, setLicensePlate] = useState<string>("");
-  const [type, setType] = useState<"trailer" | "truck">("truck");
-  const [containers, setContainers] = useState<{ volumeId: number }[]>([]);
-  const [volumes, setVolumes] = useState<Volume[]>([]);
-
+  const [trailerId, setTrailerId] = useState<number | null>(null);
+  const [driverId, setDriverId] = useState<number | null>(null);
+  const [tireWear, setTireWear] = useState<number>(0);
+  const [lastBatteryChangedAt, setLastBatteryChangedAt] = useState<string>("");
+  const [lastInspectedAt, setLastInspectedAt] = useState<string>("");
+  const [containers, setContainers] = useState<{ volume: number }[]>([]);
+  const [trailers, setTrailers] = useState<Trailer[]>([]);
+  const [drivers, setDrivers] = useState<Driver[]>([]);
   useEffect(() => {
-    fetchVolumes().then((res) => setVolumes(res.data));
+    fetchTrailers().then((res) => setTrailers(res.data));
   }, []);
 
   useEffect(() => {
+    fetchDrivers().then((res) => setDrivers(res.data));
+  }, []);
+  useEffect(() => {
     if (editTruck) {
       setLicensePlate(editTruck.license_plate);
-      setContainers(editTruck.containers.map((c) => ({ volumeId: c.id })));
-      setType(editTruck.type);
+      setContainers(editTruck.containers.map((c) => ({ volume: c.volume || 0 })));
+      setTrailerId(editTruck.trailer?.id || null);
+      setDriverId(editTruck.driver_id || null);
+      setTireWear(editTruck.tire_wear || 0);
+      setLastBatteryChangedAt(editTruck.last_battery_changed_at || "");
+      setLastInspectedAt(editTruck.last_inspected_at || "");
     } else {
       setLicensePlate("");
       setContainers([]);
-      setType("truck");
+      setTrailerId(null);
+      setDriverId(null);
+      setTireWear(0);
+      setLastBatteryChangedAt("");
+      setLastInspectedAt("");
     }
   }, [editTruck]);
 
   const handleAddContainer = () => {
-    setContainers((prev) => [...prev, { volumeId: volumes[0].id }]);
+    setContainers((prev) => [...prev, { volume: 0 }]);
   };
 
-  const handleChangeContainer = (index: number, volumeId: number) => {
+  const handleChangeContainer = (index: number, volume: number) => {
     setContainers((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, volumeId } : item))
+      prev.map((item, i) => (i === index ? { ...item, volume } : item))
     );
   };
 
@@ -53,16 +70,20 @@ export default function TruckFormModal({ editTruck, onClose, onSubmit }: TruckFo
 
   const handleSubmit = async () => {
     const payload: TruckPayload = {
-      type,
-      licensePlate: licensePlate,
-      containers: containers.map((c) => ({ volumeId: c.volumeId })),
+      trailer_id: trailerId,
+      driver_id: driverId,
+      tire_wear: tireWear,
+      last_battery_changed_at: lastBatteryChangedAt,
+      last_inspected_at: lastInspectedAt,
+      license_plate: licensePlate,
+      containers: containers.map((c) => ({ volume: c.volume || 0 })),
     };
     await onSubmit(payload);
     onClose();
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full max-w-[1080px] overflow-x-hidden px-4 md:px-6">
       <h2 className="text-xl font-semibold text-white">
         {editTruck ? "Ачилтын машин засах" : "Ачилтын машин нэмэх"}
       </h2>
@@ -71,6 +92,7 @@ export default function TruckFormModal({ editTruck, onClose, onSubmit }: TruckFo
         <div className="md:col-span-1">
           <Label htmlFor="license-plate">Улсын дугаар</Label>
           <Input
+            className="w-full dark:bg-dark-900"
             id="license-plate"
             type="text"
             placeholder="1234УБА"
@@ -79,11 +101,43 @@ export default function TruckFormModal({ editTruck, onClose, onSubmit }: TruckFo
           />
         </div>
         <div className="md:col-span-1">
-          <Label htmlFor="type">Төрөл</Label>
+          <Label htmlFor="trailer-id">Чиргүүл</Label>
           <Select
-            options={[{ value: "truck", label: "Ачилтын машин" }, { value: "trailer", label: "Чиргүүл" }]}
-            defaultValue={editTruck ? editTruck.type : "truck"}
-            onChange={(selected) => setType(selected as "trailer" | "truck")}
+            options={trailers.map((t) => ({ value: t.id.toString(), label: t.license_plate }))}
+            defaultValue={editTruck ? editTruck.trailer?.id?.toString() || "" : ""}
+            onChange={(selected) => setTrailerId(parseInt(selected))}
+          />
+        </div>
+
+        <div className="md:col-span-1">
+          <Label htmlFor="license-plate">Жолооч</Label>
+          <Select
+            options={drivers.map((d) => ({ value: d.id.toString(), label: `${d.firstname} ${d.lastname}` }))}
+            defaultValue={editTruck ? editTruck.driver_id?.toString() || "" : ""}
+            onChange={(selected) => setDriverId(parseInt(selected))}
+          />
+        </div>
+        <div className="md:col-span-1">
+          <Label htmlFor="trailer-id">Аккумулятор шалгах хугацаа</Label>
+          <DatePicker
+            id="last-battery-changed-at"
+            placeholder="Аккумулятор шалгах хугацаа"
+            defaultDate={new Date(lastBatteryChangedAt)}
+            onChange={(dates, currentDateString) => {
+              setLastBatteryChangedAt(currentDateString);
+            }}
+          />
+        </div>
+
+        <div className="md:col-span-1">
+          <Label htmlFor="trailer-id">Үзлэгийн хугацаа</Label>
+          <DatePicker
+            id="last-inspected-at"
+            placeholder="Үзлэгийн хугацаа"
+            defaultDate={new Date(lastInspectedAt)}
+            onChange={(dates, currentDateString) => {
+              setLastInspectedAt(currentDateString);
+            }}
           />
         </div>
 
@@ -99,11 +153,11 @@ export default function TruckFormModal({ editTruck, onClose, onSubmit }: TruckFo
               key={index}
               className="relative mt-2 flex items-center gap-2 bg-gray-50 dark:bg-gray-800 p-3 rounded-md"
             >
-              <Select
-                options={volumes.map((v) => ({ value: v.id.toString(), label: `${v.value} л` }))}
-                defaultValue={container.volumeId.toString()}
-                onChange={(selected) => handleChangeContainer(index, parseInt(selected))}
-                className="w-full dark:bg-dark-900"
+              <Input
+                type="number"
+                placeholder="Утга"
+                value={container.volume}
+                onChange={(e) => handleChangeContainer(index, parseInt(e.target.value))}
               />
               <button
                 onClick={() => handleRemoveContainer(index)}
@@ -113,6 +167,10 @@ export default function TruckFormModal({ editTruck, onClose, onSubmit }: TruckFo
               </button>
             </div>
           ))}
+        </div>
+
+        <div className="md:col-span-1"> <Label htmlFor="tire-wear">Дугуйн гүйлт</Label>
+          <Input type="number" placeholder="Ж: 12.5" value={tireWear} onChange={(e) => setTireWear(parseFloat(e.target.value))} />
         </div>
       </div>
 

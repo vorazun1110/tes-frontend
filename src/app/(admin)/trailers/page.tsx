@@ -1,20 +1,20 @@
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import ReportTable from "@/components/report/Table";
+import TrailerTable from "@/components/trailers/Table";
 import { Metadata } from "next";
 import React from "react";
 
 export const metadata: Metadata = {
-  title: "TM Oil Trans | Цагийн бүртгэл",
+  title: "TM Oil Trans | Чиргүүл",
   description:
-    "TM Oil Trans | Цагийн бүртгэл",
+    "TM Oil Trans | Чиргүүл",
 };
 
 export default function BasicTables() {
   return (
     <div>
-      <PageBreadcrumb pageTitle="Цагийн бүртгэл" />
+      <PageBreadcrumb pageTitle="Чиргүүл" />
       <div className="space-y-6">
-        <ReportTable />
+        <TrailerTable />
       </div>
     </div>
   );

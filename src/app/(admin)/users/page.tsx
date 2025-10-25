@@ -4,9 +4,9 @@ import { Metadata } from "next";
 import React from "react";
 
 export const metadata: Metadata = {
-  title: "Tes Petrolium | Хэрэглэгч",
+  title: "TM Oil Trans | Хэрэглэгч",
   description:
-    "Tes Petrolium | Хэрэглэгч",
+    "TM Oil Trans | Хэрэглэгч",
 };
 
 export default function BasicTables() {
