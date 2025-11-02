@@ -121,7 +121,7 @@ export default function VolumeTable() {
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
               {paginatedVolumes.map((volume, index) => {
                 return (
-                  <TableRow key={volume.id} className="hover:bg-gray-700">
+                  <TableRow key={volume.id} className="hover:bg-gray-100">
                     <TableCell className="px-5 py-4 text-start text-theme-sm">
                       <Badge color="primary">{(currentPage - 1) * rowsPerPage + index + 1}</Badge>
                     </TableCell>

@@ -60,11 +60,18 @@ export interface Driver {
   lastname: string;
   position: string;
   register: string;
-  phone: number;
+  phone: string;
   truck_id: number;
   truck?: Truck;
-  trailer_id: number;
-  trailer?: Trailer;
+}
+
+export interface DriverPayload {
+  id?: number;
+  firstname: string;
+  lastname: string;
+  position: string;
+  register: string;
+  phone: string;
 }
 
 export interface User {
@@ -210,6 +217,7 @@ export interface DeliveryItem {
   withLoadDistance: number;
   withoutLoadDistance: number;
   details: FuelDetail[];
+  date?: string;
 }
 
 export interface GroupedDelivery {

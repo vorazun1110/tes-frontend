@@ -6,12 +6,8 @@ import ExcelJS from "exceljs";
 import { DeliveryItem } from "@/types/api";
 import Button from "@/components/ui/button/Button";
 
-interface FlatDelivery extends DeliveryItem {
-  date: string;
-}
-
 interface Props {
-  deliveries: FlatDelivery[];
+  deliveries: DeliveryItem[];
 }
 
 export default function ReportExcelExport({ deliveries }: Props) {
@@ -19,6 +15,9 @@ export default function ReportExcelExport({ deliveries }: Props) {
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet("Тайлан");
 
+    // ---------------------------
+    // 1️⃣ Header Rows
+    // ---------------------------
     const headerRow1 = sheet.addRow([
       "№",
       "Огноо",
@@ -53,7 +52,6 @@ export default function ReportExcelExport({ deliveries }: Props) {
     sheet.mergeCells("I1:I2");
     sheet.mergeCells("J1:J2");
     sheet.mergeCells("K1:K2");
-
     sheet.mergeCells("D1:F1");
     sheet.mergeCells("G1:H1");
 
@@ -66,24 +64,49 @@ export default function ReportExcelExport({ deliveries }: Props) {
       };
     });
 
-    deliveries.forEach((item, idx) => {
-      sheet.addRow([
-        idx + 1,
-        item.date,
-        item.locationDetail?.name ?? "-",
-        item.receiverDetail?.name ?? "-",
-        item.deliveryTruck?.license_plate ?? "-",
-        item.deliveryTrailer?.license_plate ?? "-",
-        item.withLoadDistance ?? 0,
-        item.withoutLoadDistance ?? 0,
-        item.tonKm ?? 0,
-        "where off",
-        "signature",
-      ]);
+    // ---------------------------
+    // 2️⃣ Data Rows with Row Merge
+    // ---------------------------
+    let currentRow = 3;
+
+    deliveries.forEach((delivery, deliveryIdx) => {
+      const rowSpan = delivery.details.length || 1;
+
+      delivery.details.forEach((detail) => {
+        sheet.addRow([
+          deliveryIdx + 1, // A
+          delivery.date,   // B
+          detail.name ?? "-",             // C
+          detail.averageDensity ?? "-",   // D
+          detail.volume ?? 0,             // E
+          detail.mass ?? 0,               // F
+          delivery.withLoadDistance ?? 0,     // G
+          delivery.withoutLoadDistance ?? 0,  // H
+          delivery.tonKm ?? 0,                // I
+          delivery.locationDetail?.name ?? "-",  // J
+          delivery.receiverDetail?.name ?? "-",  // K
+        ]);
+      });
+
+      // Vertically merge fields for rowspan simulation
+      const startRow = currentRow;
+      const endRow = currentRow + rowSpan - 1;
+
+      const columnsToMerge = ["A", "B", "G", "H", "I", "J", "K"];
+      for (const col of columnsToMerge) {
+        if (rowSpan > 1) {
+          sheet.mergeCells(`${col}${startRow}:${col}${endRow}`);
+        }
+      }
+
+      currentRow += rowSpan;
     });
 
+    // ---------------------------
+    // 3️⃣ Style Formatting
+    // ---------------------------
     sheet.columns.forEach((col) => {
-      col.width = 18;
+      col.width = 16;
     });
 
     sheet.eachRow((row) => {
@@ -94,9 +117,13 @@ export default function ReportExcelExport({ deliveries }: Props) {
           bottom: { style: "thin" },
           right: { style: "thin" },
         };
+        cell.alignment = { horizontal: "center", vertical: "middle" };
       });
     });
 
+    // ---------------------------
+    // 4️⃣ Export File
+    // ---------------------------
     const buffer = await workbook.xlsx.writeBuffer();
     saveAs(new Blob([buffer]), `Report_${new Date().toISOString()}.xlsx`);
   };

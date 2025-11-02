@@ -9,7 +9,6 @@ import {
   TableRow,
 } from "../ui/table";
 import { Driver } from "@/types/api";
-import Badge from "../ui/badge/Badge";
 import { Input } from "../ui/input";
 import Pagination from "../ui/pagination";
 import Modal from "../modal/BasicModal";
@@ -116,21 +115,37 @@ export default function DriverTable() {
                 <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">#</TableCell>
                 <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Нэр</TableCell>
                 <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Овог</TableCell>
+                <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Албан тушаал</TableCell>
+                <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">РД</TableCell>
+                <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Утасны дугаар</TableCell>
+                <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Ачилтын машин</TableCell>
                 <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Үйлдэл</TableCell>
               </TableRow>
             </TableHeader>
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
               {paginatedDrivers.map((driver, index) => {
                 return (
-                  <TableRow key={driver.id} className="hover:bg-gray-700">
+                  <TableRow key={driver.id} className="hover:bg-gray-100">
                     <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      <Badge color="primary">{(currentPage - 1) * rowsPerPage + index + 1}</Badge>
+                      {(currentPage - 1) * rowsPerPage + index + 1}
                     </TableCell>
                     <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      <Badge color="primary">{driver.firstname}</Badge>
+                      {driver.firstname}
                     </TableCell>
                     <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      <Badge color="primary">{driver.lastname}</Badge>
+                      {driver.lastname}
+                    </TableCell>
+                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                      {driver.position}
+                    </TableCell>
+                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                      {driver.register}
+                    </TableCell>
+                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                      {driver.phone}
+                    </TableCell>
+                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                      {driver.truck?.license_plate}
                     </TableCell>
                     <TableCell className="px-5 py-4 text-start text-theme-sm">
                       <div className="flex gap-2">

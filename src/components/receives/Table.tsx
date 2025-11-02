@@ -8,31 +8,20 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { Delivery, DeliveryReceivePayload, DeliveryUpsertPayload } from "@/types/deliveries";
+import { Delivery, DeliveryReceivePayload } from "@/types/deliveries";
 import Badge from "../ui/badge/Badge";
 import { Input } from "../ui/input";
 import Pagination from "../ui/pagination";
 import Modal from "../modal/BasicModal";
-import Button from "@/components/ui/button/Button";
-import { CheckCircle, Pencil, Trash2 } from "lucide-react";
-import { useConfirmDialog } from "@/hooks/useConfirmDialog";
-import ConfirmDialog from "../ui/modal/ConfirmDialog";
+import { CheckCircle, Pencil } from "lucide-react";
 import {
   fetchDeliveries,
-  createDelivery,
-  updateDelivery,
-  deleteDelivery,
   receiveDeliveryApiCall,
 } from "@/services/delivery";
-import DeliveryFormModal from "./Modal";
 import dayjs from "dayjs";
-import { Driver, FuelType, Location, Trailer, Truck, Distance, User as UserType } from "@/types/api";
-import { fetchDrivers } from "@/services/driver";
-import { fetchLocations } from "@/services/location";
-import { fetchTrucks } from "@/services/truck";
-import { fetchTrailers } from "@/services/trailer";
-import { fetchFuelTypes } from "@/services/fuel";
-import DeliveryReceiveModal from "./ReceiveModal";
+import { Distance, User as UserType } from "@/types/api";
+
+import ReceiveFormModal from "./Modal";
 import { fetchDistances } from "@/services/distance";
 import { getToken, getUserFromToken } from "@/lib/auth";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -42,7 +31,7 @@ import { Dayjs } from "dayjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export default function DeliveryTable() {
+export default function ReceiveTable() {
   const token = getToken();
   const sessionUser = getUserFromToken<UserType>(token) ?? null;
 
@@ -52,39 +41,19 @@ export default function DeliveryTable() {
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editDelivery, setEditDelivery] = useState<Delivery | null>(null);
   const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
   const [receiveDelivery, setReceiveDelivery] = useState<Delivery | null>(null);
   const [distances, setDistances] = useState<Distance[]>([]);
 
-  const {
-    isOpen: isConfirmOpen,
-    confirm: openConfirm,
-    options: confirmOptions,
-    handleClose: closeConfirm,
-    handleConfirm: confirmDelete,
-  } = useConfirmDialog();
-
   const rowsPerPage = 5;
 
-  const [drivers, setDrivers] = useState<Driver[]>([]);
-  const [locations, setLocations] = useState<Location[]>([]);
-  const [trucks, setTrucks] = useState<Truck[]>([]);
-  const [trailers, setTrailers] = useState<Trailer[]>([]);
-  const [fuelTypes, setFuelTypes] = useState<FuelType[]>([]);
   const [dateFrom, setDateFrom] = useState<Dayjs>(dayjs().startOf("day"));
   const [dateTo, setDateTo] = useState<Dayjs>(dayjs().endOf("day"));
 
   useEffect(() => {
     (async () => {
       try {
-        fetchDrivers().then((res) => setDrivers(res.data));
-        fetchLocations().then((res) => setLocations(res.data));
-        fetchTrucks().then((res) => setTrucks(res.data));
-        fetchTrailers().then((res) => setTrailers(res.data));
-        fetchFuelTypes().then((res) => setFuelTypes(res.data));
-        fetchDeliveries(dateFrom.format("YYYY-MM-DD"), dateTo.format("YYYY-MM-DD"), "0").then((res) => setDeliveries(res.data));
+        fetchDeliveries(dateFrom.format("YYYY-MM-DD"), dateTo.format("YYYY-MM-DD"), "1").then((res) => setDeliveries(res.data));
         fetchDistances().then((res) => setDistances(res.data));
       } catch (err: unknown) {
         if (err instanceof Error) setError(err.message);
@@ -115,46 +84,12 @@ export default function DeliveryTable() {
 
   const totalPages = Math.ceil(filteredDeliveries.length / rowsPerPage) || 1;
 
-  const handleSubmit = async (payload: DeliveryUpsertPayload) => {
-    try {
-      if (editDelivery) {
-        const res = await updateDelivery(editDelivery.id, payload);
-        setDeliveries((prev) =>
-          prev.map((d) => (d.id === editDelivery.id ? res.data : d))
-        );
-      } else {
-        const res = await createDelivery(payload);
-        setDeliveries((prev) => [res.data, ...prev]);
-      }
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("An unknown error occurred");
-      }
-    } finally {
-      setIsModalOpen(false);
-      setEditDelivery(null);
-      fetchDeliveries(dateFrom.format("YYYY-MM-DD"), dateTo.format("YYYY-MM-DD"), "0").then((res) => setDeliveries(res.data));
-    }
-  };
-
   const handleSubmitReceive = async (payload: DeliveryReceivePayload) => {
     try {
       await receiveDeliveryApiCall(receiveDelivery?.id ?? null, payload);
       fetchDeliveries(dateFrom.format("YYYY-MM-DD"), dateTo.format("YYYY-MM-DD"), "0").then((res) => setDeliveries(res.data));
       setIsReceiveModalOpen(false);
       setReceiveDelivery(null);
-    } catch (err: unknown) {
-      if (err instanceof Error) setError(err.message);
-      else setError("An unknown error occurred");
-    }
-  };
-
-  const handleDelete = async (id: number) => {
-    try {
-      await deleteDelivery(id);
-      setDeliveries((prev) => prev.filter((d) => d.id !== id));
     } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);
       else setError("An unknown error occurred");
@@ -261,18 +196,6 @@ export default function DeliveryTable() {
             </LocalizationProvider>
           </div>
         </div>
-
-        {/* right action */}
-        {sessionUser?.role === "manager" ? (
-          <Button
-            onClick={() => {
-              setEditDelivery(null);
-              setIsModalOpen(true);
-            }}
-          >
-            + Нэмэх
-          </Button>
-        ) : null}
       </div>
       <div className="max-w-full overflow-x-auto min-h-[360px]">
         <div className="min-w-[1000px]">
@@ -376,32 +299,17 @@ export default function DeliveryTable() {
                           </button>
                         ) : null}
                         {
-                          sessionUser?.role === "manager" ? (
-                            <>
-                              <button
-                                onClick={() => {
-                                  setEditDelivery(delivery);
-                                  setIsModalOpen(true);
-                                }}
-                                className="text-blue-600 hover:text-blue-800"
-                              >
-                                <Pencil size={18} />
-                              </button>
-                              <button
-                                onClick={() => {
-                                  openConfirm(() => handleDelete(delivery.id), {
-                                    title: "Хүргэлт устгах",
-                                    description: `"${delivery.date}" өдөртэй хүргэлтийг устгах уу?`,
-                                    confirmText: "Устгах",
-                                    cancelText: "Цуцлах",
-                                  });
-                                }}
-                                className="text-red-600 hover:text-red-800"
-                              >
-                                <Trash2 size={18} />
-                              </button>
-                            </>
-                          ) : null
+                          <>
+                            <button
+                              onClick={() => {
+                                setReceiveDelivery(delivery);
+                                setIsReceiveModalOpen(true);
+                              }}
+                              className="text-blue-600 hover:text-blue-800"
+                            >
+                              <Pencil size={18} />
+                            </button>
+                          </>
                         }
                       </div>
                     </TableCell>
@@ -425,24 +333,8 @@ export default function DeliveryTable() {
         />
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <DeliveryFormModal
-          editDelivery={editDelivery}
-          onClose={() => {
-            setIsModalOpen(false);
-            setEditDelivery(null);
-          }}
-          onSubmit={handleSubmit}
-          drivers={drivers}
-          locations={locations}
-          trucks={trucks}
-          trailers={trailers}
-          fuelTypes={fuelTypes}
-        />
-      </Modal>
-
       <Modal isOpen={isReceiveModalOpen} onClose={() => setIsReceiveModalOpen(false)}>
-        <DeliveryReceiveModal
+        <ReceiveFormModal
           receiveDelivery={receiveDelivery}
           onClose={() => {
             setIsReceiveModalOpen(false);
@@ -453,12 +345,6 @@ export default function DeliveryTable() {
         />
       </Modal>
 
-      <ConfirmDialog
-        isOpen={isConfirmOpen}
-        onClose={closeConfirm}
-        onConfirm={confirmDelete}
-        {...confirmOptions}
-      />
     </div>
   );
 }

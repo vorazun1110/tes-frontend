@@ -21,7 +21,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pr
           className={`px-3 py-1 rounded ${
             page === currentPage
               ? "bg-blue-600 text-white"
-              : "bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-white"
+              : "bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-100 text-gray-700 dark:text-white"
           }`}
         >
           {page}

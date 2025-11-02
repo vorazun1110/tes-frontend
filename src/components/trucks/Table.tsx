@@ -186,7 +186,7 @@ export default function TruckTable() {
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05] dark:text-white">
             {paginatedTrucks.map((truck, index) => {
               return (
-                <TableRow key={truck.id} className="hover:bg-gray-700">
+                <TableRow key={truck.id} className="hover:bg-gray-100">
                   <TableCell className="px-5 py-4 text-start text-theme-sm">
                     {(currentPage - 1) * rowsPerPage + index + 1}
                   </TableCell>

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Table } from "../ui/table";
 import { fetchReport } from "@/services/report";
-import { DeliveryItem, GroupedDelivery, ReportResponse } from "@/types/api";
+import { ApiResponse, DeliveryItem, Driver, GroupedDelivery, ReportResponse } from "@/types/api";
 import ReportTableHead from "./Table/ReportTableHead";
 import ReportTableBody from "./Table/ReportTableBody";
 import ReportExcelExport from "./Table/ExcelExport";
@@ -11,6 +11,8 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs, { Dayjs } from "dayjs";
+import Select from "../form/Select";
+import { fetchDrivers } from "@/services/driver";
 
 interface FlatDelivery extends DeliveryItem {
   date: string;
@@ -18,17 +20,21 @@ interface FlatDelivery extends DeliveryItem {
 
 export default function ReportTable() {
   const [deliveries, setDeliveries] = useState<FlatDelivery[]>([]);
+  const [drivers, setDrivers] = useState<Driver[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const [dateFrom, setDateFrom] = useState<Dayjs>(dayjs().startOf("month"));
   const [dateTo, setDateTo] = useState<Dayjs>(dayjs().endOf("month"));
+  const [driverId, setDriverId] = useState<string>("1");
 
   const loadData = async () => {
     try {
+      const driversResponse: ApiResponse<Driver[]> = await fetchDrivers();
+      setDrivers(driversResponse.data);
       const response: ReportResponse = await fetchReport(
         dateFrom.format("YYYY-MM-DD"),
         dateTo.format("YYYY-MM-DD"),
-        "1",
+        driverId,
       );
 
       const flatDeliveries: FlatDelivery[] = response.data.deliveries.flatMap(
@@ -52,7 +58,7 @@ export default function ReportTable() {
 
   useEffect(() => {
     loadData();
-  }, [dateFrom, dateTo]);
+  }, [dateFrom, dateTo, driverId]);
 
   return (
     <>
@@ -67,6 +73,14 @@ export default function ReportTable() {
               onChange={(newVal) => {
                 if (newVal) setDateFrom(newVal);
               }}
+              slotProps={{
+                textField: {
+                  sx: {
+                    width: "60%",
+                    size: "small",
+                  },
+                },
+              }}
             />
             <DatePicker
               format="YYYY-MM-DD"
@@ -76,6 +90,23 @@ export default function ReportTable() {
               onChange={(newVal) => {
                 if (newVal) setDateTo(newVal);
               }}
+              slotProps={{
+                textField: {
+                  sx: {
+                    width: "60%",
+                    size: "small",
+                  },
+                },
+              }}
+            />
+            <Select
+              options={drivers.map((driver: Driver) => ({
+                value: driver.id.toString(),
+                label: `${driver.lastname} ${driver.firstname}`,
+              }))}
+              onChange={(value) => setDriverId(value)}
+              defaultValue={driverId}
+              placeholder="Сонгох..."
             />
           </LocalizationProvider>
         </div>

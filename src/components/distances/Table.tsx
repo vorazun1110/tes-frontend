@@ -9,7 +9,6 @@ import {
   TableRow,
 } from "../ui/table";
 import { Distance, DistancePayload } from "@/types/api";
-import Badge from "../ui/badge/Badge";
 import { Input } from "../ui/input";
 import Pagination from "../ui/pagination";
 import Modal from "../modal/BasicModal";
@@ -183,23 +182,19 @@ export default function DistanceTable() {
               <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
                 {paginatedDistances.map((distance, index) => {
                   return (
-                    <TableRow key={distance.id} className="hover:bg-gray-700">
+                    <TableRow key={distance.id} className="hover:bg-gray-100">
                       <TableCell className="px-5 py-4 text-start text-theme-sm">
-                        <Badge color="primary">
-                          {(currentPage - 1) * rowsPerPage + index + 1}
-                        </Badge>
+                        {(currentPage - 1) * rowsPerPage + index + 1}
                       </TableCell>
                       <TableCell className="px-5 py-4 text-start text-theme-sm">
-                        <Badge color="primary">{distance.name}</Badge>
+                        {distance.name}
                       </TableCell>
                       <TableCell className="px-5 py-4 text-start text-theme-sm">
-                        <Badge color="primary">
-                          {distance?.location1?.name}
-                        </Badge>
-                        <Badge color="warning"> {distance?.location2?.name} </Badge>
+                        {distance?.location1?.name}
+                        {distance?.location2?.name}
                       </TableCell>
                       <TableCell className="px-5 py-4 text-start text-theme-sm">
-                        <Badge color="primary">{distance.distance} км</Badge>
+                        {distance.distance} км
                       </TableCell>
                       <TableCell className="px-5 py-4 text-start text-theme-sm">
                         <div className="flex gap-2">

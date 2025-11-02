@@ -124,7 +124,7 @@ export default function UserTable() {
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
               {paginatedUsers.map((user, index) => {
                 return (
-                  <TableRow key={user.id} className="hover:bg-gray-700">
+                  <TableRow key={user.id} className="hover:bg-gray-100">
                     <TableCell className="px-5 py-4 text-start text-theme-sm">
                       <Badge color="primary">{(currentPage - 1) * rowsPerPage + index + 1}</Badge>
                     </TableCell>

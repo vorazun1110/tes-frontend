@@ -7,17 +7,16 @@ import { EyeCloseIcon, EyeIcon } from "@/icons";
 import Link from "next/link";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { apiAction } from "@/lib/api"; // adjust import if different
+import { apiAction } from "@/lib/api";
 import { AUTH_TOKEN_KEY } from "@/lib/auth";
 
 type LoginResponse = {
   success: boolean;
   message: string;
   data: {
-    token?: string; // adapt keys to your API response
+    token?: string;
     user?: unknown;
   };
-  // add refreshToken, expiresIn, etc. if your API returns them
 };
 
 export default function SignInForm() {
@@ -55,7 +54,7 @@ export default function SignInForm() {
         throw new Error("Токен олдсонгүй. Серверийн хариуг шалгана уу.");
       }
 
-      const storage = isChecked ? window.localStorage : window.sessionStorage;
+      const storage = isChecked ? window.localStorage : window.localStorage;
       storage.setItem(AUTH_TOKEN_KEY, token);
 
 

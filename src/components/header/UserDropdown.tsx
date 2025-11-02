@@ -4,12 +4,14 @@ import React, { useState } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { useRouter } from "next/navigation";
-import { clearAuth } from "@/lib/auth";
+import { clearAuth, getToken, getUserFromToken } from "@/lib/auth";
 import Link from "next/link";
+import type { User as UserType } from "@/types/api";
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
-
+  const token = getToken();
+  const user = getUserFromToken<UserType>(token) ?? null;
   function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     e.stopPropagation();
     setIsOpen((prev) => !prev);
@@ -41,7 +43,7 @@ export default function UserDropdown() {
           />
         </span>
 
-        <span className="block mr-1 font-medium text-theme-sm">Админ</span>
+        <span className="block mr-1 font-medium text-theme-sm">{user?.firstname} {user?.lastname}</span>
 
         <svg
           className={`stroke-gray-500 dark:stroke-  gray-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""

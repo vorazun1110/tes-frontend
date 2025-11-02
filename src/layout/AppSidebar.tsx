@@ -17,6 +17,8 @@ import {
   ChevronDownIcon,
   HorizontaLDots,
 } from "../icons/index";
+import type { User as UserType } from "@/types/api";
+import { getToken, getUserFromToken } from "@/lib/auth";
 
 
 type NavItem = {
@@ -26,7 +28,33 @@ type NavItem = {
   subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
 };
 
-const navItems: NavItem[] = [
+const inspectorNavItems: NavItem[] = [
+  {
+    icon: <LayoutDashboard />,
+    name: "Нүүр",
+    path: "/",
+  },
+  {
+    icon: <Fuel />,
+    name: "Түгээлт",
+    path: "/deliveries",
+  },
+];
+
+const managerNavItems: NavItem[] = [
+  {
+    icon: <LayoutDashboard />,
+    name: "Нүүр",
+    path: "/",
+  },
+  {
+    icon: <Fuel />,
+    name: "Түгээлт",
+    path: "/deliveries",
+  },
+];
+
+const adminNavItems: NavItem[] = [
   {
     icon: <LayoutDashboard />,
     name: "Нүүр",
@@ -66,8 +94,20 @@ const navItems: NavItem[] = [
 ];
 
 const AppSidebar: React.FC = () => {
+  // const { user } = useAuth();
+  const token = getToken();
+  const user = getUserFromToken<UserType>(token) ?? null;
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
+
+  const _navItems = () => {
+    if (user?.role === "manager") return managerNavItems;
+    if (user?.role === "inspector") return inspectorNavItems;
+    if (user?.role === "admin") return adminNavItems;
+    return [];
+  };
+
+  const navItems = _navItems();
 
   const renderMenuItems = (
     navItems: NavItem[],
@@ -222,7 +262,7 @@ const AppSidebar: React.FC = () => {
     if (!submenuMatched) {
       setOpenSubmenu(null);
     }
-  }, [pathname, isActive]);
+  }, [pathname, isActive, navItems]);
 
   useEffect(() => {
     // Set the height of the submenu items when the submenu is opened

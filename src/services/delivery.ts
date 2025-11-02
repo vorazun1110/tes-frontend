@@ -2,8 +2,8 @@ import { apiGet, apiAction } from "@/lib/api";
 import { Delivery, DeliveryReceivePayload, DeliveryUpsertPayload } from "@/types/deliveries";
 import { ApiResponse } from "@/types/api";
 
-export async function fetchDeliveries(dateFilter: string): Promise<ApiResponse<Delivery[]>> {
-  return await apiGet<ApiResponse<Delivery[]>>(`/deliveries?date=${dateFilter}`);
+export async function fetchDeliveries(dateFrom: string, dateTo: string, isReceived: string): Promise<ApiResponse<Delivery[]>> {
+  return await apiGet<ApiResponse<Delivery[]>>(`/deliveries?startDate=${dateFrom}&endDate=${dateTo}&is_received=${isReceived}`);
 }
 
 export async function updateDelivery(
