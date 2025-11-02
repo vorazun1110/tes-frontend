@@ -16,8 +16,11 @@ export default function ReportTable() {
   const [deliveries, setDeliveries] = useState<FlatDelivery[]>([]);
   const [error, setError] = useState<string | null>(null);
 
+  const [dateFrom, setDateFrom] = useState("2025-11-01");
+  const [dateTo, setDateTo] = useState("2025-11-05");
+
   useEffect(() => {
-    fetchReport("2025-11-01", "2025-11-05", "1")
+    fetchReport(dateFrom, dateTo, "1")
       .then((response: ReportResponse) => {
         const reportData = response.data;
         const flatDeliveries: FlatDelivery[] = reportData.deliveries.flatMap(
