@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { Driver } from "@/types/api";
+import { Driver, DriverPayload } from "@/types/api";
 import { Input } from "../ui/input";
 import Pagination from "../ui/pagination";
 import Modal from "../modal/BasicModal";
@@ -55,7 +55,7 @@ export default function DriverTable() {
 
   const totalPages = Math.ceil(filteredDrivers.length / rowsPerPage);
 
-  const handleSubmit = async (payload: Driver) => {
+  const handleSubmit = async (payload: DriverPayload) => {
     try {
       if (editDriver) {
         const res = await updateDriver(editDriver.id, payload);
