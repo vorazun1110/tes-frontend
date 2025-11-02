@@ -3,17 +3,99 @@ import { TableHeader, TableRow, TableCell } from "@/components/ui/table";
 
 export default function ReportTableHead() {
   return (
-    <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
-      <TableRow>
-        <TableCell isHeader>№</TableCell>
-        <TableCell isHeader>Огноо</TableCell>
-        <TableCell isHeader>Байршил</TableCell>
-        <TableCell isHeader>Хүлээн авагч</TableCell>
-        <TableCell isHeader>Машин</TableCell>
-        <TableCell isHeader>Чиргүүл</TableCell>
-        <TableCell isHeader>Тон.км</TableCell>
-        <TableCell isHeader>Ачаатай км</TableCell>
-        <TableCell isHeader>Ачаагүй км</TableCell>
+    <TableHeader className="border border-gray-300 dark:border-white/[0.1]">
+      {/* First Row */}
+      <TableRow className="border-b border-gray-300 text-center dark:border-white/[0.1]">
+        <TableCell
+          isHeader
+          rowSpan={2}
+          className="border border-gray-300 text-center dark:border-white/[0.1]"
+        >
+          №
+        </TableCell>
+        <TableCell
+          isHeader
+          rowSpan={2}
+          className="border border-gray-300 text-center dark:border-white/[0.1]"
+        >
+          Огноо
+        </TableCell>
+        <TableCell
+          isHeader
+          rowSpan={2}
+          className="border border-gray-300 text-center dark:border-white/[0.1]"
+        >
+          Шатахууны марк
+        </TableCell>
+        <TableCell
+          isHeader
+          colSpan={3}
+          className="border border-gray-300 text-center dark:border-white/[0.1]"
+        >
+          Ачааны хэмжээ
+        </TableCell>
+        <TableCell
+          isHeader
+          colSpan={2}
+          className="border border-gray-300 text-center dark:border-white/[0.1]"
+        >
+          Явсан зам (км)
+        </TableCell>
+        <TableCell
+          isHeader
+          rowSpan={2}
+          className="border border-gray-300 text-center dark:border-white/[0.1]"
+        >
+          Тонн/км
+        </TableCell>
+        <TableCell
+          isHeader
+          rowSpan={2}
+          className="border border-gray-300 text-center dark:border-white/[0.1]"
+        >
+          Хаана буусан
+        </TableCell>
+        <TableCell
+          isHeader
+          rowSpan={2}
+          className="border border-gray-300 text-center dark:border-white/[0.1]"
+        >
+          Хүлээн авсан хүний нэр, гарын үсэг
+        </TableCell>
+      </TableRow>
+
+      {/* Second Row */}
+      <TableRow className="text-center">
+        <TableCell
+          isHeader
+          className="border border-gray-300 text-center dark:border-white/[0.1]"
+        >
+          %-ийн жин
+        </TableCell>
+        <TableCell
+          isHeader
+          className="border border-gray-300 text-center dark:border-white/[0.1]"
+        >
+          Литр
+        </TableCell>
+        <TableCell
+          isHeader
+          className="border border-gray-300 text-center dark:border-white/[0.1]"
+        >
+          Нийт жин
+        </TableCell>
+        <TableCell
+          isHeader
+          className="border border-gray-300 text-center dark:border-white/[0.1]"
+        >
+          Ачаатай
+        </TableCell>
+        <TableCell
+          isHeader
+          className="border border-gray-300 text-center dark:border-white/[0.1]"
+        >
+          Сул
+        </TableCell>
       </TableRow>
     </TableHeader>
   );

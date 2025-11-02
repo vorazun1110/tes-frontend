@@ -12,18 +12,42 @@ interface Props {
 
 export default function ReportTableBody({ deliveries }: Props) {
   return (
-    <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+    <TableBody className="divide-y divide-gray-300 dark:divide-white/[0.1]">
       {deliveries.map((item, idx) => (
-        <TableRow key={idx}>
-          <TableCell>{idx + 1}</TableCell>
-          <TableCell>{item.date}</TableCell>
-          <TableCell>{item.locationDetail?.name ?? "-"}</TableCell>
-          <TableCell>{item.receiverDetail?.name ?? "-"}</TableCell>
-          <TableCell>{item.deliveryTruck?.license_plate ?? "-"}</TableCell>
-          <TableCell>{item.deliveryTrailer?.license_plate ?? "-"}</TableCell>
-          <TableCell>{item.tonKm}</TableCell>
-          <TableCell>{item.withLoadDistance}</TableCell>
-          <TableCell>{item.withoutLoadDistance}</TableCell>
+        <TableRow key={idx} className="text-center">
+          <TableCell className="border border-gray-300 dark:border-white/[0.1]">
+            {idx + 1}
+          </TableCell>
+          <TableCell className="border border-gray-300 dark:border-white/[0.1]">
+            {item.date}
+          </TableCell>
+          <TableCell className="border border-gray-300 dark:border-white/[0.1]">
+            {item.locationDetail?.name ?? "-"}
+          </TableCell>
+          <TableCell className="border border-gray-300 dark:border-white/[0.1]">
+            {item.receiverDetail?.name ?? "-"}
+          </TableCell>
+          <TableCell className="border border-gray-300 dark:border-white/[0.1]">
+            {item.deliveryTruck?.license_plate ?? "-"}
+          </TableCell>
+          <TableCell className="border border-gray-300 dark:border-white/[0.1]">
+            {item.deliveryTrailer?.license_plate ?? "-"}
+          </TableCell>
+          <TableCell className="border border-gray-300 dark:border-white/[0.1]">
+            {item.tonKm}
+          </TableCell>
+          <TableCell className="border border-gray-300 dark:border-white/[0.1]">
+            {item.withLoadDistance}
+          </TableCell>
+          <TableCell className="border border-gray-300 dark:border-white/[0.1]">
+            {item.withoutLoadDistance}
+          </TableCell>
+          <TableCell className="border border-gray-300 dark:border-white/[0.1]">
+            where off
+          </TableCell>
+          <TableCell className="border border-gray-300 dark:border-white/[0.1]">
+            signature
+          </TableCell>
         </TableRow>
       ))}
     </TableBody>
