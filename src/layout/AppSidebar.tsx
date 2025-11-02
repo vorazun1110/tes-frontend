@@ -8,7 +8,6 @@ import {
   Users,
   Truck,
   User,
-  GaugeCircle,
   MapPin,
   Fuel,
   Timer
@@ -52,11 +51,6 @@ const navItems: NavItem[] = [
     icon: <User />,
     name: "Ажилтаны мэдээлэл",
     path: "/drivers",
-  },
-  {
-    icon: <GaugeCircle />,
-    name: "Ачилтын хэмжээ",
-    path: "/volumes",
   },
   {
     icon: <MapPin />,
@@ -313,7 +307,7 @@ const AppSidebar: React.FC = () => {
                   }`}
               >
                 {isExpanded || isHovered || isMobileOpen ? (
-                  "Menu"
+                  ""
                 ) : (
                   <HorizontaLDots />
                 )}

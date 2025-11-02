@@ -1,22 +1,30 @@
 export interface Container {
     volume: number | null;
+    id?: number;
 }
 
 export interface Truck {
     id: number;
     license_plate: string;
-    containers: Container[];
+    containers: TruckContainer[];
     tire_wear: number;
     last_battery_changed_at: string;
     last_inspected_at: string;
     driver?: Driver;
     driver_id?: number | null;
+    trailer_id?: number | null;
     trailer?: {
         id: number;
         license_plate: string;
-        containers: Container[];
+        containers: TruckContainer[];
     }
 }
+
+export interface TruckContainer {
+    id: number;
+    volume: number | null;
+}
+
 
 export interface TruckPayload {
     license_plate: string;
@@ -51,6 +59,13 @@ export interface Driver {
     id: number;
     firstname: string;
     lastname: string;
+    position: string;
+    register: string;
+    phone: number;
+    truck_id: number;
+    truck?: Truck;
+    trailer_id: number;
+    trailer?: Trailer;
 }
 
 export interface User {
@@ -152,16 +167,78 @@ export interface LocationDetail {
     id: number;
     name: string;
 }
+export interface FuelType {
+    id: number;
+    name: string;
+}
 
-export interface ReportDelivery {
-    date: string;
+export interface FuelTypeSummary {
+    id: number;
+    name: string;
+    volume: number;
+    averageDensity: number;
+}
+
+export interface FuelDetail {
+    id: number;
+    name: string;
+    mass: number;
+    volume: number;
+    averageDensity: number;
+}
+
+export interface Vehicle {
+    id: number;
+    license_plate: string;
+}
+
+export interface LocationDetail {
+    id: number;
+    name: string;
+}
+
+export interface ReceiverDetail {
+    id: number;
+    name: string;
+}
+
+export interface DeliveryItem {
+    locationDetail: LocationDetail | null;
+    receiverDetail: ReceiverDetail | null;
+    deliveryTruck: Vehicle;
+    deliveryTrailer: Vehicle;
     tonKm: number;
     withLoadDistance: number;
     withoutLoadDistance: number;
-    locationDetail: LocationDetail | null;
-    fuelTypeDetail: FuelTypeDetail[];
+    details: FuelDetail[];
 }
 
-export interface ReportResponse {
-    deliveries: ReportDelivery[];
+export interface GroupedDelivery {
+    date: string;
+    deliveries: DeliveryItem[];
 }
+
+export interface ReportData {
+    totalMass: number;
+    totalTonKm: number;
+    totalVolume: number;
+    totalDistance: number;
+    totalWithLoadDistance: number;
+    totalWithoutLoadDistance: number;
+    totalFuelTypeDetail: FuelTypeSummary[];
+    deliveries: GroupedDelivery[];
+}
+
+export interface ReportMeta {
+    period: {
+        startDate: string;
+        endDate: string;
+    };
+    filters: {
+        driverId: string;
+        truckId: number | null;
+    };
+    totalDeliveries: number;
+    generatedAt: string;
+}
+

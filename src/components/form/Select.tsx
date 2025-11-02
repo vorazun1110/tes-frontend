@@ -21,7 +21,6 @@ const Select: React.FC<SelectProps> = ({
   defaultValue = "",
 }) => {
   const [selectedValue, setSelectedValue] = useState<string>(defaultValue);
-
   useEffect(() => {
     // Allow external changes to update the internal value
     setSelectedValue(defaultValue || "");

@@ -155,113 +155,111 @@ export default function TruckTable() {
           + Нэмэх
         </Button>
       </div>
-      <div className="max-w-full overflow-x-auto">
-        <div className="min-w-[800px]">
-          <Table>
-            <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
-              <TableRow>
-                <TableCell isHeader rowSpan={2} className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">#</TableCell>
-                <TableCell isHeader rowSpan={2} className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Улсын дугаар</TableCell>
-                <TableCell isHeader rowSpan={2} className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Жолооч</TableCell>
+      <div className="w-full overflow-x-auto">
+        <Table className="min-w-[1100px]">
+          <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
+            <TableRow>
+              <TableCell isHeader rowSpan={2} className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">#</TableCell>
+              <TableCell isHeader rowSpan={2} className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Улсын дугаар</TableCell>
+              <TableCell isHeader rowSpan={2} className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Жолооч</TableCell>
 
-                <TableCell isHeader colSpan={4} className="px-5 py-3 text-gray-500 text-center text-theme-xs dark:text-gray-400">
-                  Багтаамж
-                </TableCell>
+              <TableCell isHeader colSpan={4} className="px-5 py-3 text-gray-500 text-center text-theme-xs dark:text-gray-400">
+                Багтаамж
+              </TableCell>
 
-                <TableCell isHeader rowSpan={2} className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Чиргүүл</TableCell>
+              <TableCell isHeader rowSpan={2} className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Чиргүүл</TableCell>
 
-                <TableCell isHeader rowSpan={2} className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Дугуйн гүйлт</TableCell>
-                <TableCell isHeader rowSpan={2} className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Аккумулятор солих хугацаа</TableCell>
-                <TableCell isHeader rowSpan={2} className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Үзлэгийн хугацаа</TableCell>
-                <TableCell isHeader rowSpan={2} className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Үйлдэл</TableCell>
-              </TableRow>
+              <TableCell isHeader rowSpan={2} className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Дугуйн гүйлт</TableCell>
+              <TableCell isHeader rowSpan={2} className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Аккумулятор солих хугацаа</TableCell>
+              <TableCell isHeader rowSpan={2} className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Үзлэгийн хугацаа</TableCell>
+              <TableCell isHeader rowSpan={2} className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Үйлдэл</TableCell>
+            </TableRow>
 
-              <TableRow>
-                <TableCell isHeader className="px-5 py-3 text-gray-500 text-center text-theme-xs dark:text-gray-400">Лүүк 1</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-gray-500 text-center text-theme-xs dark:text-gray-400">Лүүк 2</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-gray-500 text-center text-theme-xs dark:text-gray-400">Лүүк 3</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-gray-500 text-center text-theme-xs dark:text-gray-400">Лүүк 4</TableCell>
-              </TableRow>
-            </TableHeader>
+            <TableRow>
+              <TableCell isHeader className="px-5 py-3 text-gray-500 text-center text-theme-xs dark:text-gray-400">Лүүк 1</TableCell>
+              <TableCell isHeader className="px-5 py-3 text-gray-500 text-center text-theme-xs dark:text-gray-400">Лүүк 2</TableCell>
+              <TableCell isHeader className="px-5 py-3 text-gray-500 text-center text-theme-xs dark:text-gray-400">Лүүк 3</TableCell>
+              <TableCell isHeader className="px-5 py-3 text-gray-500 text-center text-theme-xs dark:text-gray-400">Лүүк 4</TableCell>
+            </TableRow>
+          </TableHeader>
 
-            <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05] dark:text-white">
-              {paginatedTrucks.map((truck, index) => {
-                return (
-                  <TableRow key={truck.id} className="hover:bg-gray-700">
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      {(currentPage - 1) * rowsPerPage + index + 1}
-                    </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      {truck.license_plate}
-                    </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      {truck.driver?.firstname || ''}{' '}{truck.driver?.lastname || ''}
-                    </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      {truck.containers[0]?.volume || '-'}
-                    </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      {truck.containers[1]?.volume || '-'}
-                    </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      {truck.containers[2]?.volume || '-'}
-                    </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      {truck.containers[3]?.volume || '-'}
-                    </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      {truck.trailer?.license_plate || '-'}
-                    </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      {truck.tire_wear || '-'}
-                    </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      {truck.last_battery_changed_at || '-'}
-                    </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      {truck.last_inspected_at || '-'}
-                    </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => {
-                            setEditTruck(truck);
-                            setIsModalOpen(true);
-                          }}
-                          className="text-blue-600 hover:text-blue-800"
-                        >
-                          <Pencil size={18} />
-                        </button>
-                        <button
-                          onClick={() => {
-                            openConfirm(() => handleDelete(truck.id), {
-                              title: "Мэдээлэл устгах",
-                              description: `"${truck.license_plate}" дугаартай машиныг устгах уу?`,
-                              confirmText: "Устгах",
-                              cancelText: "Цуцлах",
-                            });
-                          }}
-                          className="text-red-600 hover:text-red-800"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-          {error && (
-            <div className="p-4 text-red-500 font-medium text-sm">Error: {error}</div>
-          )}
-          <div className="flex justify-end p-4">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
-          </div>
+          <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05] dark:text-white">
+            {paginatedTrucks.map((truck, index) => {
+              return (
+                <TableRow key={truck.id} className="hover:bg-gray-700">
+                  <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    {(currentPage - 1) * rowsPerPage + index + 1}
+                  </TableCell>
+                  <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    {truck.license_plate}
+                  </TableCell>
+                  <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    {truck.driver?.firstname || ''}{' '}{truck.driver?.lastname || ''}
+                  </TableCell>
+                  <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    {truck.containers[0]?.volume || '-'}
+                  </TableCell>
+                  <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    {truck.containers[1]?.volume || '-'}
+                  </TableCell>
+                  <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    {truck.containers[2]?.volume || '-'}
+                  </TableCell>
+                  <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    {truck.containers[3]?.volume || '-'}
+                  </TableCell>
+                  <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    {truck.trailer?.license_plate || '-'}
+                  </TableCell>
+                  <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    {truck.tire_wear || '-'}
+                  </TableCell>
+                  <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    {truck.last_battery_changed_at || '-'}
+                  </TableCell>
+                  <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    {truck.last_inspected_at || '-'}
+                  </TableCell>
+                  <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          setEditTruck(truck);
+                          setIsModalOpen(true);
+                        }}
+                        className="text-blue-600 hover:text-blue-800"
+                      >
+                        <Pencil size={18} />
+                      </button>
+                      <button
+                        onClick={() => {
+                          openConfirm(() => handleDelete(truck.id), {
+                            title: "Мэдээлэл устгах",
+                            description: `"${truck.license_plate}" дугаартай машиныг устгах уу?`,
+                            confirmText: "Устгах",
+                            cancelText: "Цуцлах",
+                          });
+                        }}
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+        {error && (
+          <div className="p-4 text-red-500 font-medium text-sm">Error: {error}</div>
+        )}
+        <div className="flex justify-end p-4">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
         </div>
       </div>
 

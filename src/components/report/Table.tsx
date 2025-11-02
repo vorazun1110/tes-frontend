@@ -2,29 +2,37 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '../ui/table';
+import dayjs from 'dayjs';
 import Badge from '../ui/badge/Badge';
 import { Input } from '../ui/input';
 import Pagination from '../ui/pagination';
 import { fetchReport } from '@/services/report';
-import { ReportDelivery, FuelTypeDetail } from '@/types/api';
-import dayjs from 'dayjs';
+import { ReportDelivery } from '@/types/api';
 
 export default function ReportTable() {
   const [deliveries, setDeliveries] = useState<ReportDelivery[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 5;
+  const rowsPerPage = 10;
 
   useEffect(() => {
-    fetchReport('2025-01-01', '2025-11-01', '1')
-      .then((res) => setDeliveries(res.data.deliveries))
+    fetchReport('2025-11-01', '2025-11-02', '1')
+      .then((res) => {
+        const flatDeliveries = res.data.deliveries.flatMap((day) =>
+          day.deliveries.map((d) => ({
+            date: day.date,
+            ...d,
+          }))
+        );
+        setDeliveries(flatDeliveries);
+      })
       .catch((err) => setError(err.message));
   }, []);
 
   const filteredDeliveries = useMemo(() => {
     return deliveries.filter((d) =>
-      d.locationDetail?.name?.toLowerCase().includes(search.toLowerCase())
+      d.deliveryTruck.license_plate.toLowerCase().includes(search.toLowerCase())
     );
   }, [deliveries, search]);
 
@@ -40,7 +48,7 @@ export default function ReportTable() {
       <div className="p-4 flex justify-between items-center">
         <Input
           type="text"
-          placeholder="Байршил хайх..."
+          placeholder="Хайлт (машин)..."
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
@@ -51,44 +59,72 @@ export default function ReportTable() {
       </div>
 
       <div className="max-w-full overflow-x-auto">
-        <div className="min-w-[1000px]">
+        <div className="min-w-[1200px]">
           <Table className="dark:text-white">
             <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
               <TableRow>
                 <TableCell isHeader>#</TableCell>
                 <TableCell isHeader>Огноо</TableCell>
-                <TableCell isHeader>Байршил</TableCell>
-                <TableCell isHeader>ton.km</TableCell>
-                <TableCell isHeader>Ачаатай/Ачаагүй зай</TableCell>
-                <TableCell isHeader>Шатахуун</TableCell>
+                <TableCell isHeader>Шатахуун (жингийн %)</TableCell>
+                <TableCell isHeader>Литр</TableCell>
+                <TableCell isHeader>Нийт жин (кг)</TableCell>
+                <TableCell isHeader>Ачаатай / Сул (км)</TableCell>
+                <TableCell isHeader>Тонн.км</TableCell>
+                <TableCell isHeader>Хаана буусан</TableCell>
+                <TableCell isHeader>Хүлээн авсан</TableCell>
               </TableRow>
             </TableHeader>
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-              {paginatedDeliveries.map((delivery, index) => (
-                <TableRow key={index}>
-                  <TableCell>
-                    <Badge color="primary">
-                      {(currentPage - 1) * rowsPerPage + index + 1}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{dayjs(delivery.date).format('YYYY-MM-DD')}</TableCell>
-                  <TableCell>{delivery.locationDetail?.name || '-'}</TableCell>
-                  <TableCell>{delivery.tonKm}</TableCell>
-                  <TableCell>
-                    {delivery.withLoadDistance} км / {delivery.withoutLoadDistance} км
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-col gap-1">
-                      {delivery.fuelTypeDetail.map((fuel: FuelTypeDetail) => (
-                        <span key={fuel.id}>
-                          {fuel.name}: {fuel.volume} л
-                        </span>
-                      ))}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {paginatedDeliveries.flatMap((delivery, index) => {
+                const detailCount = delivery.details.length;
+
+                return delivery.details.map((detail, detailIndex) => (
+                  <TableRow key={`${index}-${detailIndex}`}>
+                    {/* Only show full row data on the first detail */}
+                    {detailIndex === 0 && (
+                      <>
+                        <TableCell rowSpan={detailCount}>
+                          <Badge color="primary">
+                            {(currentPage - 1) * rowsPerPage + index + 1}
+                          </Badge>
+                        </TableCell>
+                        <TableCell rowSpan={detailCount}>
+                          {dayjs(delivery.date).format('YYYY-MM-DD')}
+                        </TableCell>
+                      </>
+                    )}
+
+                    {/* Fuel type + density */}
+                    <TableCell>
+                      {detail.name} ({detail.averageDensity})
+                    </TableCell>
+
+                    {/* Volume */}
+                    <TableCell>{detail.volume} л</TableCell>
+
+                    {/* Mass */}
+                    <TableCell>{detail.mass.toFixed(2)} кг</TableCell>
+
+                    {/* Only show distance/ton-km/location/receiver on first detail row */}
+                    {detailIndex === 0 && (
+                      <>
+                        <TableCell rowSpan={detailCount}>
+                          {delivery.withLoadDistance} / {delivery.withoutLoadDistance}
+                        </TableCell>
+                        <TableCell rowSpan={detailCount}>{delivery.tonKm}</TableCell>
+                        <TableCell rowSpan={detailCount}>
+                          {delivery.locationDetail?.name || '-'}
+                        </TableCell>
+                        <TableCell rowSpan={detailCount}>
+                          {delivery.receiverDetail?.name || '-'}
+                        </TableCell>
+                      </>
+                    )}
+                  </TableRow>
+                ));
+              })}
             </TableBody>
+
           </Table>
 
           {error && (

@@ -4,9 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import Button from "../ui/button/Button";
 import Label from "../form/Label";
-import Select from "../form/Select";
-import { fetchVolumes } from "@/services/volume";
-import { Trailer, TrailerPayload, Volume } from "@/types/api";
+import { Container, Trailer, TrailerPayload } from "@/types/api";
 import { Trash2 } from "lucide-react";
 
 interface TrailerFormModalProps {
@@ -17,27 +15,22 @@ interface TrailerFormModalProps {
 
 export default function TrailerFormModal({ editTrailer, onClose, onSubmit }: TrailerFormModalProps) {
   const [licensePlate, setLicensePlate] = useState<string>("");
-  const [containers, setContainers] = useState<{ volumeId: number }[]>([]);
-  const [volumes, setVolumes] = useState<Volume[]>([]);
-
-  useEffect(() => {
-    fetchVolumes().then((res) => setVolumes(res.data));
-  }, []);
+  const [containers, setContainers] = useState<Container[]>([]);
 
   useEffect(() => {
     if (editTrailer) {
       setLicensePlate(editTrailer.license_plate);
-      setContainers(editTrailer.containers.map((c) => ({ volumeId: c.id })));
+      setContainers(editTrailer.containers);
     }
   }, [editTrailer]);
 
   const handleAddContainer = () => {
-    setContainers((prev) => [...prev, { volumeId: volumes[0].id }]);
+    setContainers((prev) => [...prev, { volume: null }]);
   };
 
-  const handleChangeContainer = (index: number, volumeId: number) => {
+  const handleChangeContainer = (index: number, volume: number | null) => {
     setContainers((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, volumeId } : item))
+      prev.map((item, i) => (i === index ? { ...item, volume } : item))
     );
   };
 
@@ -48,7 +41,7 @@ export default function TrailerFormModal({ editTrailer, onClose, onSubmit }: Tra
   const handleSubmit = async () => {
     const payload: TrailerPayload = {
       license_plate: licensePlate,
-      containers: containers.map((c) => ({ volumeId: c.volumeId })),
+      containers: containers.map((c) => ({ volume: c.volume || 0 })),
     };
     await onSubmit(payload);
     onClose();
@@ -84,11 +77,11 @@ export default function TrailerFormModal({ editTrailer, onClose, onSubmit }: Tra
                 key={index}
                 className="relative mt-2 flex items-center gap-2 bg-gray-50 dark:bg-gray-800 p-3 rounded-md"
               >
-                <Select
-                  options={volumes.map((v) => ({ value: v.id.toString(), label: `${v.value} л` }))}
-                  defaultValue={container.volumeId.toString()}
-                  onChange={(selected) => handleChangeContainer(index, parseInt(selected))}
-                  className="w-full dark:bg-dark-900"
+                <input
+                  type="number"
+                  placeholder="Утга"
+                  value={container.volume || ""}
+                  onChange={(e) => handleChangeContainer(index, parseInt(e.target.value))}
                 />
                 <button
                   onClick={() => handleRemoveContainer(index)}

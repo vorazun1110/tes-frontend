@@ -68,6 +68,7 @@ export default function TrailerTable() {
         const res = await createTrailer(payload);
         setTrailers((prev) => [res.data, ...prev]);
       }
+      setError(null);
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
