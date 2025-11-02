@@ -263,7 +263,7 @@ export default function DeliveryTable() {
         </div>
 
         {/* right action */}
-        {sessionUser?.role === "manager" ? (
+        {sessionUser?.role === "manager" || "admin" ? (
           <Button
             onClick={() => {
               setEditDelivery(null);
@@ -376,7 +376,7 @@ export default function DeliveryTable() {
                           </button>
                         ) : null}
                         {
-                          sessionUser?.role === "manager" ? (
+                          sessionUser?.role === "manager" || "admin" ? (
                             <>
                               <button
                                 onClick={() => {

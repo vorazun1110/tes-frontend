@@ -44,6 +44,7 @@ export interface FuelDetail {
     fuelTypeId: number;
     volume?: number;
     containerId: number;
+    density?: number | null;
 }
 
 export interface DeliveryUpsertPayload {
@@ -82,4 +83,5 @@ export interface DeliveryFuelDetail {
     fuelTypeId: number;
     volume?: number;
     containerId: number;
+    density?: number | null;
 }

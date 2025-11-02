@@ -32,7 +32,7 @@ export default function ReceiveFormModal({
   useEffect(() => {
     const defaultMap: Record<number, number> = {};
     allFuelDetails.forEach((d) => {
-      defaultMap[d.id] = 0;
+      defaultMap[d.id] = d.density ?? 0;
     });
     setDensityMap(defaultMap);
   }, [allFuelDetails]);

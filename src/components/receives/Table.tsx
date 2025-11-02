@@ -13,28 +13,23 @@ import Badge from "../ui/badge/Badge";
 import { Input } from "../ui/input";
 import Pagination from "../ui/pagination";
 import Modal from "../modal/BasicModal";
-import { CheckCircle, Pencil } from "lucide-react";
+import { Pencil } from "lucide-react";
 import {
   fetchDeliveries,
   receiveDeliveryApiCall,
 } from "@/services/delivery";
 import dayjs from "dayjs";
-import { Distance, User as UserType } from "@/types/api";
-
 import ReceiveFormModal from "./Modal";
 import { fetchDistances } from "@/services/distance";
-import { getToken, getUserFromToken } from "@/lib/auth";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers";
 import { Dayjs } from "dayjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Distance } from "@/types/api";
 
 export default function ReceiveTable() {
-  const token = getToken();
-  const sessionUser = getUserFromToken<UserType>(token) ?? null;
-
   const pathname = usePathname();
 
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
@@ -87,7 +82,7 @@ export default function ReceiveTable() {
   const handleSubmitReceive = async (payload: DeliveryReceivePayload) => {
     try {
       await receiveDeliveryApiCall(receiveDelivery?.id ?? null, payload);
-      fetchDeliveries(dateFrom.format("YYYY-MM-DD"), dateTo.format("YYYY-MM-DD"), "0").then((res) => setDeliveries(res.data));
+      fetchDeliveries(dateFrom.format("YYYY-MM-DD"), dateTo.format("YYYY-MM-DD"), "1").then((res) => setDeliveries(res.data));
       setIsReceiveModalOpen(false);
       setReceiveDelivery(null);
     } catch (err: unknown) {
@@ -287,17 +282,6 @@ export default function ReceiveTable() {
                     </TableCell>
                     <TableCell className="px-5 py-4 text-start text-theme-sm">
                       <div className="flex gap-2">
-                        {!delivery.is_received && sessionUser?.role === "inspector" ? (
-                          <button
-                            onClick={() => {
-                              setReceiveDelivery(delivery);
-                              setIsReceiveModalOpen(true);
-                            }}>
-                            <Badge color="success" size="sm" startIcon={<CheckCircle size={22} />}>
-                              Хүлээн авах
-                            </Badge>
-                          </button>
-                        ) : null}
                         {
                           <>
                             <button
