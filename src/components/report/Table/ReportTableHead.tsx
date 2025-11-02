@@ -4,7 +4,6 @@ import { TableHeader, TableRow, TableCell } from "@/components/ui/table";
 export default function ReportTableHead() {
   return (
     <TableHeader className="border border-gray-300 dark:border-white/[0.1]">
-      {/* First Row */}
       <TableRow className="border-b border-gray-300 text-center dark:border-white/[0.1]">
         <TableCell
           isHeader
@@ -64,7 +63,6 @@ export default function ReportTableHead() {
         </TableCell>
       </TableRow>
 
-      {/* Second Row */}
       <TableRow className="text-center">
         <TableCell
           isHeader

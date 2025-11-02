@@ -38,7 +38,7 @@ export default function ReportTable() {
         <ReportExcelExport deliveries={deliveries} />
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+      <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
         {error ? (
           <div className="p-4 text-sm text-red-500">{error}</div>
         ) : (
