@@ -16,7 +16,12 @@ import Button from "@/components/ui/button/Button";
 import { Pencil, Trash2 } from "lucide-react";
 import { useConfirmDialog } from "@/hooks/useConfirmDialog";
 import ConfirmDialog from "../ui/modal/ConfirmDialog";
-import { createDriver, deleteDriver, fetchDrivers, updateDriver } from "@/services/driver";
+import {
+  createDriver,
+  deleteDriver,
+  fetchDrivers,
+  updateDriver,
+} from "@/services/driver";
 import DriverFormModal from "./Modal";
 
 export default function DriverTable() {
@@ -34,7 +39,7 @@ export default function DriverTable() {
     handleConfirm: confirmDelete,
   } = useConfirmDialog();
 
-  const rowsPerPage = 5;
+  const rowsPerPage = 10;
 
   useEffect(() => {
     fetchDrivers()
@@ -44,7 +49,7 @@ export default function DriverTable() {
 
   const filteredDrivers = useMemo(() => {
     return drivers.filter((driver) =>
-      driver.firstname.toLowerCase().includes(search.toLowerCase())
+      driver.firstname.toLowerCase().includes(search.toLowerCase()),
     );
   }, [drivers, search]);
 
@@ -60,7 +65,7 @@ export default function DriverTable() {
       if (editDriver) {
         const res = await updateDriver(editDriver.id, payload);
         setDrivers((prev) =>
-          prev.map((d) => (d.id === editDriver.id ? res.data : d))
+          prev.map((d) => (d.id === editDriver.id ? res.data : d)),
         );
       } else {
         const res = await createDriver(payload);
@@ -88,11 +93,9 @@ export default function DriverTable() {
     }
   };
 
-
-
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
-      <div className="p-4 flex justify-between items-center">
+      <div className="flex items-center justify-between p-4">
         <Input
           type="text"
           placeholder="Нэр хайх..."
@@ -103,7 +106,13 @@ export default function DriverTable() {
           }}
           className="w-full max-w-sm"
         />
-        <Button className="ml-4" onClick={() => { setEditDriver(null); setIsModalOpen(true); }}>
+        <Button
+          className="ml-4"
+          onClick={() => {
+            setEditDriver(null);
+            setIsModalOpen(true);
+          }}
+        >
           + Нэмэх
         </Button>
       </div>
@@ -112,42 +121,82 @@ export default function DriverTable() {
           <Table>
             <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
               <TableRow>
-                <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">#</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Нэр</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Овог</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Албан тушаал</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">РД</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Утасны дугаар</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Ачилтын машин</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Үйлдэл</TableCell>
+                <TableCell
+                  isHeader
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+                >
+                  #
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+                >
+                  Нэр
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+                >
+                  Овог
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+                >
+                  Албан тушаал
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+                >
+                  РД
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+                >
+                  Утасны дугаар
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+                >
+                  Ачилтын машин
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+                >
+                  Үйлдэл
+                </TableCell>
               </TableRow>
             </TableHeader>
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
               {paginatedDrivers.map((driver, index) => {
                 return (
                   <TableRow key={driver.id} className="hover:bg-gray-100">
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
                       {(currentPage - 1) * rowsPerPage + index + 1}
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
                       {driver.firstname}
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
                       {driver.lastname}
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
                       {driver.position}
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
                       {driver.register}
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
                       {driver.phone}
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
                       {driver.truck?.license_plate}
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
                       <div className="flex gap-2">
                         <button
                           onClick={() => {
@@ -179,7 +228,9 @@ export default function DriverTable() {
             </TableBody>
           </Table>
           {error && (
-            <div className="p-4 text-red-500 font-medium text-sm">Error: {error}</div>
+            <div className="p-4 text-sm font-medium text-red-500">
+              Error: {error}
+            </div>
           )}
           <div className="flex justify-end p-4">
             <Pagination

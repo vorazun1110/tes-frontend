@@ -8,7 +8,11 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { Delivery, DeliveryReceivePayload, DeliveryUpsertPayload } from "@/types/deliveries";
+import {
+  Delivery,
+  DeliveryReceivePayload,
+  DeliveryUpsertPayload,
+} from "@/types/deliveries";
 import Badge from "../ui/badge/Badge";
 import { Input } from "../ui/input";
 import Pagination from "../ui/pagination";
@@ -26,9 +30,17 @@ import {
 } from "@/services/delivery";
 import DeliveryFormModal from "./Modal";
 import dayjs from "dayjs";
-import { Driver, FuelType, Location, Trailer, Truck, Distance, User as UserType } from "@/types/api";
+import {
+  Driver,
+  FuelType,
+  // Location,
+  Trailer,
+  Truck,
+  Distance,
+  User as UserType,
+} from "@/types/api";
 import { fetchDrivers } from "@/services/driver";
-import { fetchLocations } from "@/services/location";
+// import { fetchLocations } from "@/services/location";
 import { fetchTrucks } from "@/services/truck";
 import { fetchTrailers } from "@/services/trailer";
 import { fetchFuelTypes } from "@/services/fuel";
@@ -66,10 +78,10 @@ export default function DeliveryTable() {
     handleConfirm: confirmDelete,
   } = useConfirmDialog();
 
-  const rowsPerPage = 5;
+  const rowsPerPage = 10;
 
   const [drivers, setDrivers] = useState<Driver[]>([]);
-  const [locations, setLocations] = useState<Location[]>([]);
+  // const [locations, setLocations] = useState<Location[]>([]);
   const [trucks, setTrucks] = useState<Truck[]>([]);
   const [trailers, setTrailers] = useState<Trailer[]>([]);
   const [fuelTypes, setFuelTypes] = useState<FuelType[]>([]);
@@ -80,11 +92,15 @@ export default function DeliveryTable() {
     (async () => {
       try {
         fetchDrivers().then((res) => setDrivers(res.data));
-        fetchLocations().then((res) => setLocations(res.data));
+        // fetchLocations().then((res) => setLocations(res.data));
         fetchTrucks().then((res) => setTrucks(res.data));
         fetchTrailers().then((res) => setTrailers(res.data));
         fetchFuelTypes().then((res) => setFuelTypes(res.data));
-        fetchDeliveries(dateFrom.format("YYYY-MM-DD"), dateTo.format("YYYY-MM-DD"), "0").then((res) => setDeliveries(res.data));
+        fetchDeliveries(
+          dateFrom.format("YYYY-MM-DD"),
+          dateTo.format("YYYY-MM-DD"),
+          "0",
+        ).then((res) => setDeliveries(res.data));
         fetchDistances().then((res) => setDistances(res.data));
       } catch (err: unknown) {
         if (err instanceof Error) setError(err.message);
@@ -96,7 +112,8 @@ export default function DeliveryTable() {
   const filteredDeliveries = useMemo(() => {
     const q = search.toLowerCase();
     return deliveries.filter((delivery) => {
-      const driverName = `${delivery.driver?.lastname || ""} ${delivery.driver?.firstname || ""}`.toLowerCase();
+      const driverName =
+        `${delivery.driver?.lastname || ""} ${delivery.driver?.firstname || ""}`.toLowerCase();
       const fromName = delivery.fromLocation?.name?.toLowerCase?.() || "";
       const toName = delivery.toLocation?.name?.toLowerCase?.() || "";
       return (
@@ -120,7 +137,7 @@ export default function DeliveryTable() {
       if (editDelivery) {
         const res = await updateDelivery(editDelivery.id, payload);
         setDeliveries((prev) =>
-          prev.map((d) => (d.id === editDelivery.id ? res.data : d))
+          prev.map((d) => (d.id === editDelivery.id ? res.data : d)),
         );
       } else {
         const res = await createDelivery(payload);
@@ -135,14 +152,22 @@ export default function DeliveryTable() {
     } finally {
       setIsModalOpen(false);
       setEditDelivery(null);
-      fetchDeliveries(dateFrom.format("YYYY-MM-DD"), dateTo.format("YYYY-MM-DD"), "0").then((res) => setDeliveries(res.data));
+      fetchDeliveries(
+        dateFrom.format("YYYY-MM-DD"),
+        dateTo.format("YYYY-MM-DD"),
+        "0",
+      ).then((res) => setDeliveries(res.data));
     }
   };
 
   const handleSubmitReceive = async (payload: DeliveryReceivePayload) => {
     try {
       await receiveDeliveryApiCall(receiveDelivery?.id ?? null, payload);
-      fetchDeliveries(dateFrom.format("YYYY-MM-DD"), dateTo.format("YYYY-MM-DD"), "0").then((res) => setDeliveries(res.data));
+      fetchDeliveries(
+        dateFrom.format("YYYY-MM-DD"),
+        dateTo.format("YYYY-MM-DD"),
+        "0",
+      ).then((res) => setDeliveries(res.data));
       setIsReceiveModalOpen(false);
       setReceiveDelivery(null);
     } catch (err: unknown) {
@@ -189,7 +214,9 @@ export default function DeliveryTable() {
             Түгээлт
           </Link>
 
-          <span className="select-none text-gray-300 dark:text-white/30">|</span>
+          <span className="text-gray-300 select-none dark:text-white/30">
+            |
+          </span>
 
           <Link
             href="/receives"
@@ -209,7 +236,7 @@ export default function DeliveryTable() {
           </Link>
         </div>
       </div>
-      <div className="p-4 flex items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-4 p-4">
         {/* left filters */}
         <div className="flex flex-1 items-center gap-4">
           <Input
@@ -220,7 +247,7 @@ export default function DeliveryTable() {
               setSearch(e.target.value);
               setCurrentPage(1);
             }}
-            className="max-w-sm w-full"
+            className="w-full max-w-sm"
           />
           <div className="flex items-center gap-4">
             <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -274,56 +301,56 @@ export default function DeliveryTable() {
           </Button>
         ) : null}
       </div>
-      <div className="max-w-full overflow-x-auto min-h-[360px]">
+      <div className="min-h-[360px] max-w-full overflow-x-auto">
         <div className="min-w-[1000px]">
           <Table className="">
             <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
               <TableRow>
                 <TableCell
                   isHeader
-                  className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
                 >
                   #
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
                 >
                   Огноо
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
                 >
                   Жолооч
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
                 >
                   Ачилт (хаанаас)
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
                 >
                   Хүргэлт (хаашаа)
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
                 >
                   Машин
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
                 >
                   Чиргүүл
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
                 >
                   Үйлдэл
                 </TableCell>
@@ -333,76 +360,76 @@ export default function DeliveryTable() {
               {paginatedDeliveries.map((delivery, index) => {
                 return (
                   <TableRow key={delivery.id} className="hover:bg-gray-50">
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
                       <Badge color="primary">
                         {(currentPage - 1) * rowsPerPage + index + 1}
                       </Badge>
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
                       {delivery.date}
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
                       {delivery.driver
                         ? `${delivery.driver.lastname} ${delivery.driver.firstname}`
                         : "-"}
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
                       {delivery.fromLocation?.name || "-"}
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
                       {delivery.toLocation?.name || "-"}
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      {delivery.truck
-                        ? delivery.truck.licensePlate
-                        : "-"}
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
+                      {delivery.truck ? delivery.truck.licensePlate : "-"}
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      {delivery.trailers
-                        ? delivery.trailers.licensePlate
-                        : "-"}
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
+                      {delivery.trailers ? delivery.trailers.licensePlate : "-"}
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
                       <div className="flex gap-2">
-                        {!delivery.is_received && sessionUser?.role === "inspector" ? (
+                        {!delivery.is_received &&
+                        sessionUser?.role === "inspector" ? (
                           <button
                             onClick={() => {
                               setReceiveDelivery(delivery);
                               setIsReceiveModalOpen(true);
-                            }}>
-                            <Badge color="success" size="sm" startIcon={<CheckCircle size={22} />}>
+                            }}
+                          >
+                            <Badge
+                              color="success"
+                              size="sm"
+                              startIcon={<CheckCircle size={22} />}
+                            >
                               Хүлээн авах
                             </Badge>
                           </button>
                         ) : null}
-                        {
-                          sessionUser?.role === "manager" || "admin" ? (
-                            <>
-                              <button
-                                onClick={() => {
-                                  setEditDelivery(delivery);
-                                  setIsModalOpen(true);
-                                }}
-                                className="text-blue-600 hover:text-blue-800"
-                              >
-                                <Pencil size={18} />
-                              </button>
-                              <button
-                                onClick={() => {
-                                  openConfirm(() => handleDelete(delivery.id), {
-                                    title: "Хүргэлт устгах",
-                                    description: `"${delivery.date}" өдөртэй хүргэлтийг устгах уу?`,
-                                    confirmText: "Устгах",
-                                    cancelText: "Цуцлах",
-                                  });
-                                }}
-                                className="text-red-600 hover:text-red-800"
-                              >
-                                <Trash2 size={18} />
-                              </button>
-                            </>
-                          ) : null
-                        }
+                        {sessionUser?.role === "manager" || "admin" ? (
+                          <>
+                            <button
+                              onClick={() => {
+                                setEditDelivery(delivery);
+                                setIsModalOpen(true);
+                              }}
+                              className="text-blue-600 hover:text-blue-800"
+                            >
+                              <Pencil size={18} />
+                            </button>
+                            <button
+                              onClick={() => {
+                                openConfirm(() => handleDelete(delivery.id), {
+                                  title: "Хүргэлт устгах",
+                                  description: `"${delivery.date}" өдөртэй хүргэлтийг устгах уу?`,
+                                  confirmText: "Устгах",
+                                  cancelText: "Цуцлах",
+                                });
+                              }}
+                              className="text-red-600 hover:text-red-800"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          </>
+                        ) : null}
                       </div>
                     </TableCell>
                   </TableRow>
@@ -414,7 +441,9 @@ export default function DeliveryTable() {
       </div>
 
       {error && (
-        <div className="p-4 text-red-500 font-medium text-sm">Error: {error}</div>
+        <div className="p-4 text-sm font-medium text-red-500">
+          Error: {error}
+        </div>
       )}
 
       <div className="flex justify-end p-4">
@@ -434,14 +463,16 @@ export default function DeliveryTable() {
           }}
           onSubmit={handleSubmit}
           drivers={drivers}
-          locations={locations}
           trucks={trucks}
           trailers={trailers}
           fuelTypes={fuelTypes}
         />
       </Modal>
 
-      <Modal isOpen={isReceiveModalOpen} onClose={() => setIsReceiveModalOpen(false)}>
+      <Modal
+        isOpen={isReceiveModalOpen}
+        onClose={() => setIsReceiveModalOpen(false)}
+      >
         <DeliveryReceiveModal
           receiveDelivery={receiveDelivery}
           onClose={() => {

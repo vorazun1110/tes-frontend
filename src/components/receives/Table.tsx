@@ -14,10 +14,7 @@ import { Input } from "../ui/input";
 import Pagination from "../ui/pagination";
 import Modal from "../modal/BasicModal";
 import { Pencil } from "lucide-react";
-import {
-  fetchDeliveries,
-  receiveDeliveryApiCall,
-} from "@/services/delivery";
+import { fetchDeliveries, receiveDeliveryApiCall } from "@/services/delivery";
 import dayjs from "dayjs";
 import ReceiveFormModal from "./Modal";
 import { fetchDistances } from "@/services/distance";
@@ -40,7 +37,7 @@ export default function ReceiveTable() {
   const [receiveDelivery, setReceiveDelivery] = useState<Delivery | null>(null);
   const [distances, setDistances] = useState<Distance[]>([]);
 
-  const rowsPerPage = 5;
+  const rowsPerPage = 10;
 
   const [dateFrom, setDateFrom] = useState<Dayjs>(dayjs().startOf("day"));
   const [dateTo, setDateTo] = useState<Dayjs>(dayjs().endOf("day"));
@@ -48,7 +45,11 @@ export default function ReceiveTable() {
   useEffect(() => {
     (async () => {
       try {
-        fetchDeliveries(dateFrom.format("YYYY-MM-DD"), dateTo.format("YYYY-MM-DD"), "1").then((res) => setDeliveries(res.data));
+        fetchDeliveries(
+          dateFrom.format("YYYY-MM-DD"),
+          dateTo.format("YYYY-MM-DD"),
+          "1",
+        ).then((res) => setDeliveries(res.data));
         fetchDistances().then((res) => setDistances(res.data));
       } catch (err: unknown) {
         if (err instanceof Error) setError(err.message);
@@ -60,7 +61,8 @@ export default function ReceiveTable() {
   const filteredDeliveries = useMemo(() => {
     const q = search.toLowerCase();
     return deliveries.filter((delivery) => {
-      const driverName = `${delivery.driver?.lastname || ""} ${delivery.driver?.firstname || ""}`.toLowerCase();
+      const driverName =
+        `${delivery.driver?.lastname || ""} ${delivery.driver?.firstname || ""}`.toLowerCase();
       const fromName = delivery.fromLocation?.name?.toLowerCase?.() || "";
       const toName = delivery.toLocation?.name?.toLowerCase?.() || "";
       return (
@@ -82,7 +84,11 @@ export default function ReceiveTable() {
   const handleSubmitReceive = async (payload: DeliveryReceivePayload) => {
     try {
       await receiveDeliveryApiCall(receiveDelivery?.id ?? null, payload);
-      fetchDeliveries(dateFrom.format("YYYY-MM-DD"), dateTo.format("YYYY-MM-DD"), "1").then((res) => setDeliveries(res.data));
+      fetchDeliveries(
+        dateFrom.format("YYYY-MM-DD"),
+        dateTo.format("YYYY-MM-DD"),
+        "1",
+      ).then((res) => setDeliveries(res.data));
       setIsReceiveModalOpen(false);
       setReceiveDelivery(null);
     } catch (err: unknown) {
@@ -119,7 +125,9 @@ export default function ReceiveTable() {
             Түгээлт
           </Link>
 
-          <span className="select-none text-gray-300 dark:text-white/30">|</span>
+          <span className="text-gray-300 select-none dark:text-white/30">
+            |
+          </span>
 
           <Link
             href="/receives"
@@ -139,7 +147,7 @@ export default function ReceiveTable() {
           </Link>
         </div>
       </div>
-      <div className="p-4 flex items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-4 p-4">
         {/* left filters */}
         <div className="flex flex-1 items-center gap-4">
           <Input
@@ -150,7 +158,7 @@ export default function ReceiveTable() {
               setSearch(e.target.value);
               setCurrentPage(1);
             }}
-            className="max-w-sm w-full"
+            className="w-full max-w-sm"
           />
           <div className="flex items-center gap-4">
             <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -192,56 +200,56 @@ export default function ReceiveTable() {
           </div>
         </div>
       </div>
-      <div className="max-w-full overflow-x-auto min-h-[360px]">
+      <div className="min-h-[360px] max-w-full overflow-x-auto">
         <div className="min-w-[1000px]">
           <Table className="">
             <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
               <TableRow>
                 <TableCell
                   isHeader
-                  className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
                 >
                   #
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
                 >
                   Огноо
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
                 >
                   Жолооч
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
                 >
                   Ачилт (хаанаас)
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
                 >
                   Хүргэлт (хаашаа)
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
                 >
                   Машин
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
                 >
                   Чиргүүл
                 </TableCell>
                 <TableCell
                   isHeader
-                  className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
                 >
                   Үйлдэл
                 </TableCell>
@@ -251,36 +259,32 @@ export default function ReceiveTable() {
               {paginatedDeliveries.map((delivery, index) => {
                 return (
                   <TableRow key={delivery.id} className="hover:bg-gray-50">
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
                       <Badge color="primary">
                         {(currentPage - 1) * rowsPerPage + index + 1}
                       </Badge>
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
                       {delivery.date}
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
                       {delivery.driver
                         ? `${delivery.driver.lastname} ${delivery.driver.firstname}`
                         : "-"}
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
                       {delivery.fromLocation?.name || "-"}
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
                       {delivery.toLocation?.name || "-"}
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      {delivery.truck
-                        ? delivery.truck.licensePlate
-                        : "-"}
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
+                      {delivery.truck ? delivery.truck.licensePlate : "-"}
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      {delivery.trailers
-                        ? delivery.trailers.licensePlate
-                        : "-"}
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
+                      {delivery.trailers ? delivery.trailers.licensePlate : "-"}
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
                       <div className="flex gap-2">
                         {
                           <>
@@ -306,7 +310,9 @@ export default function ReceiveTable() {
       </div>
 
       {error && (
-        <div className="p-4 text-red-500 font-medium text-sm">Error: {error}</div>
+        <div className="p-4 text-sm font-medium text-red-500">
+          Error: {error}
+        </div>
       )}
 
       <div className="flex justify-end p-4">
@@ -317,7 +323,10 @@ export default function ReceiveTable() {
         />
       </div>
 
-      <Modal isOpen={isReceiveModalOpen} onClose={() => setIsReceiveModalOpen(false)}>
+      <Modal
+        isOpen={isReceiveModalOpen}
+        onClose={() => setIsReceiveModalOpen(false)}
+      >
         <ReceiveFormModal
           receiveDelivery={receiveDelivery}
           onClose={() => {
@@ -328,7 +337,6 @@ export default function ReceiveTable() {
           distances={distances}
         />
       </Modal>
-
     </div>
   );
 }

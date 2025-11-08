@@ -95,6 +95,9 @@ export interface Location {
   name: string;
   latitude: number;
   longitude: number;
+  location: string;
+  district: string;
+  locationName: string;
 }
 
 export interface LocationPayload {
@@ -109,6 +112,7 @@ export interface Distance {
   distance: number;
   location1: Location;
   location2: Location;
+  locationDistanceName: string;
 }
 
 export interface DistancePayload {

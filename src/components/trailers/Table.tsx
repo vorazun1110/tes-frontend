@@ -9,7 +9,12 @@ import {
   TableRow,
 } from "../ui/table";
 import { Trailer, TrailerPayload } from "@/types/api";
-import { createTrailer, deleteTrailer, fetchTrailers, updateTrailer } from "@/services/trailer";
+import {
+  createTrailer,
+  deleteTrailer,
+  fetchTrailers,
+  updateTrailer,
+} from "@/services/trailer";
 import { Input } from "../ui/input";
 import Pagination from "../ui/pagination";
 import Modal from "../modal/BasicModal";
@@ -37,7 +42,7 @@ export default function TrailerTable() {
     handleConfirm: confirmDelete,
   } = useConfirmDialog();
 
-  const rowsPerPage = 5;
+  const rowsPerPage = 10;
   useEffect(() => {
     fetchTrailers()
       .then((res) => setTrailers(res.data))
@@ -46,7 +51,7 @@ export default function TrailerTable() {
 
   const filteredTrailers = useMemo(() => {
     return trailers.filter((trailer) =>
-      trailer.license_plate.toLowerCase().includes(search.toLowerCase())
+      trailer.license_plate.toLowerCase().includes(search.toLowerCase()),
     );
   }, [trailers, search]);
 
@@ -62,7 +67,7 @@ export default function TrailerTable() {
       if (editTrailer) {
         const res = await updateTrailer(editTrailer.id, payload);
         setTrailers((prev) =>
-          prev.map((t) => (t.id === editTrailer.id ? res.data : t))
+          prev.map((t) => (t.id === editTrailer.id ? res.data : t)),
         );
       } else {
         const res = await createTrailer(payload);
@@ -119,7 +124,9 @@ export default function TrailerTable() {
             Ачилтын машин
           </Link>
 
-          <span className="select-none text-gray-300 dark:text-white/30">|</span>
+          <span className="text-gray-300 select-none dark:text-white/30">
+            |
+          </span>
 
           <Link
             href="/trailers"
@@ -139,7 +146,7 @@ export default function TrailerTable() {
           </Link>
         </div>
       </div>
-      <div className="p-4 flex justify-between items-center">
+      <div className="flex items-center justify-between p-4">
         <Input
           type="text"
           placeholder="Улсын дугаар хайх..."
@@ -150,7 +157,13 @@ export default function TrailerTable() {
           }}
           className="w-full max-w-sm"
         />
-        <Button className="ml-4" onClick={() => { setEditTrailer(null); setIsModalOpen(true); }}>
+        <Button
+          className="ml-4"
+          onClick={() => {
+            setEditTrailer(null);
+            setIsModalOpen(true);
+          }}
+        >
           + Нэмэх
         </Button>
       </div>
@@ -159,21 +172,63 @@ export default function TrailerTable() {
           <Table>
             <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
               <TableRow>
-                <TableCell isHeader rowSpan={2} className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">#</TableCell>
-                <TableCell isHeader rowSpan={2} className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Улсын дугаар</TableCell>
+                <TableCell
+                  isHeader
+                  rowSpan={2}
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+                >
+                  #
+                </TableCell>
+                <TableCell
+                  isHeader
+                  rowSpan={2}
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+                >
+                  Улсын дугаар
+                </TableCell>
 
-                <TableCell isHeader colSpan={4} className="px-5 py-3 text-gray-500 text-center text-theme-xs dark:text-gray-400">
+                <TableCell
+                  isHeader
+                  colSpan={4}
+                  className="text-theme-xs px-5 py-3 text-center text-gray-500 dark:text-gray-400"
+                >
                   Багтаамж
                 </TableCell>
 
-                <TableCell isHeader rowSpan={2} className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Үйлдэл</TableCell>
+                <TableCell
+                  isHeader
+                  rowSpan={2}
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+                >
+                  Үйлдэл
+                </TableCell>
               </TableRow>
 
               <TableRow>
-                <TableCell isHeader className="px-5 py-3 text-gray-500 text-center text-theme-xs dark:text-gray-400">Лүүк 1</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-gray-500 text-center text-theme-xs dark:text-gray-400">Лүүк 2</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-gray-500 text-center text-theme-xs dark:text-gray-400">Лүүк 3</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-gray-500 text-center text-theme-xs dark:text-gray-400">Лүүк 4</TableCell>
+                <TableCell
+                  isHeader
+                  className="text-theme-xs px-5 py-3 text-center text-gray-500 dark:text-gray-400"
+                >
+                  Лүүк 1
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="text-theme-xs px-5 py-3 text-center text-gray-500 dark:text-gray-400"
+                >
+                  Лүүк 2
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="text-theme-xs px-5 py-3 text-center text-gray-500 dark:text-gray-400"
+                >
+                  Лүүк 3
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="text-theme-xs px-5 py-3 text-center text-gray-500 dark:text-gray-400"
+                >
+                  Лүүк 4
+                </TableCell>
               </TableRow>
             </TableHeader>
 
@@ -181,25 +236,25 @@ export default function TrailerTable() {
               {paginatedTrailers.map((trailer, index) => {
                 return (
                   <TableRow key={trailer.id} className="hover:bg-gray-100">
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
                       {(currentPage - 1) * rowsPerPage + index + 1}
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
                       {trailer.license_plate}
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      {trailer.containers[0]?.volume || '-'}
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
+                      {trailer.containers[0]?.volume || "-"}
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      {trailer.containers[1]?.volume || '-'}
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
+                      {trailer.containers[1]?.volume || "-"}
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      {trailer.containers[2]?.volume || '-'}
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
+                      {trailer.containers[2]?.volume || "-"}
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      {trailer.containers[3]?.volume || '-'}
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
+                      {trailer.containers[3]?.volume || "-"}
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
                       <div className="flex gap-2">
                         <button
                           onClick={() => {
@@ -231,7 +286,9 @@ export default function TrailerTable() {
             </TableBody>
           </Table>
           {error && (
-            <div className="p-4 text-red-500 font-medium text-sm">Error: {error}</div>
+            <div className="p-4 text-sm font-medium text-red-500">
+              Error: {error}
+            </div>
           )}
           <div className="flex justify-end p-4">
             <Pagination

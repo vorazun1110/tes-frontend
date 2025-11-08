@@ -46,7 +46,9 @@ export default function DistanceFormModal({
         setLocationOptions(opts);
       } catch (e: unknown) {
         if (!mounted) return;
-        setLoadError(e instanceof Error ? e.message : "Failed to load locations");
+        setLoadError(
+          e instanceof Error ? e.message : "Failed to load locations",
+        );
       } finally {
         if (mounted) setLoadingLocations(false);
       }
@@ -61,14 +63,16 @@ export default function DistanceFormModal({
     if (editDistance) {
       setName(editDistance.name ?? "");
       setDistance(
-        editDistance.distance !== undefined ? String(editDistance.distance) : ""
+        editDistance.distance !== undefined
+          ? String(editDistance.distance)
+          : "",
       );
       // These lines assume editDistance contains numeric IDs for the two locations
-      if ((editDistance).location1 !== undefined) {
-        setLocation1(String((editDistance).location1));
+      if (editDistance.location1 !== undefined) {
+        setLocation1(String(editDistance.location1));
       }
-      if ((editDistance).location2 !== undefined) {
-        setLocation2(String((editDistance).location2));
+      if (editDistance.location2 !== undefined) {
+        setLocation2(String(editDistance.location2));
       }
     } else {
       setName("");
@@ -113,7 +117,7 @@ export default function DistanceFormModal({
         <div className="text-sm text-red-500">Алдаа: {loadError}</div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div className="md:col-span-1">
           <Label htmlFor="name">Нэр</Label>
           <Input
@@ -166,7 +170,7 @@ export default function DistanceFormModal({
         </div>
       </div>
 
-      <div className="flex justify-end gap-2 mt-6">
+      <div className="mt-6 flex justify-end gap-2">
         <Button variant="outline" onClick={onClose}>
           Болих
         </Button>

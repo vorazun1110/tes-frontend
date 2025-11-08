@@ -17,7 +17,12 @@ import Button from "@/components/ui/button/Button";
 import { Pencil, Trash2 } from "lucide-react";
 import { useConfirmDialog } from "@/hooks/useConfirmDialog";
 import ConfirmDialog from "../ui/modal/ConfirmDialog";
-import { createVolume, deleteVolume, fetchVolumes, updateVolume } from "@/services/volume";
+import {
+  createVolume,
+  deleteVolume,
+  fetchVolumes,
+  updateVolume,
+} from "@/services/volume";
 import VolumeFormModal from "./Modal";
 
 export default function VolumeTable() {
@@ -35,7 +40,7 @@ export default function VolumeTable() {
     handleConfirm: confirmDelete,
   } = useConfirmDialog();
 
-  const rowsPerPage = 5;
+  const rowsPerPage = 10;
 
   useEffect(() => {
     fetchVolumes()
@@ -44,9 +49,7 @@ export default function VolumeTable() {
   }, []);
 
   const filteredVolumes = useMemo(() => {
-    return volumes.filter((volume) =>
-      volume.value.toString().includes(search)
-    );
+    return volumes.filter((volume) => volume.value.toString().includes(search));
   }, [volumes, search]);
 
   const paginatedVolumes = useMemo(() => {
@@ -61,7 +64,7 @@ export default function VolumeTable() {
       if (editVolume) {
         const res = await updateVolume(editVolume.id, payload);
         setVolumes((prev) =>
-          prev.map((d) => (d.id === editVolume.id ? res.data : d))
+          prev.map((d) => (d.id === editVolume.id ? res.data : d)),
         );
       } else {
         const res = await createVolume(payload);
@@ -89,11 +92,9 @@ export default function VolumeTable() {
     }
   };
 
-
-
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
-      <div className="p-4 flex justify-between items-center">
+      <div className="flex items-center justify-between p-4">
         <Input
           type="text"
           placeholder="Утга хайх..."
@@ -104,7 +105,13 @@ export default function VolumeTable() {
           }}
           className="w-full max-w-sm"
         />
-        <Button className="ml-4" onClick={() => { setEditVolume(null); setIsModalOpen(true); }}>
+        <Button
+          className="ml-4"
+          onClick={() => {
+            setEditVolume(null);
+            setIsModalOpen(true);
+          }}
+        >
           + Нэмэх
         </Button>
       </div>
@@ -113,22 +120,39 @@ export default function VolumeTable() {
           <Table>
             <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
               <TableRow>
-                <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">#</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Утга</TableCell>
-                <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Үйлдэл</TableCell>
+                <TableCell
+                  isHeader
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+                >
+                  #
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+                >
+                  Утга
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+                >
+                  Үйлдэл
+                </TableCell>
               </TableRow>
             </TableHeader>
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
               {paginatedVolumes.map((volume, index) => {
                 return (
                   <TableRow key={volume.id} className="hover:bg-gray-100">
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
-                      <Badge color="primary">{(currentPage - 1) * rowsPerPage + index + 1}</Badge>
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
+                      <Badge color="primary">
+                        {(currentPage - 1) * rowsPerPage + index + 1}
+                      </Badge>
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
                       <Badge color="primary">{volume.value}</Badge>
                     </TableCell>
-                    <TableCell className="px-5 py-4 text-start text-theme-sm">
+                    <TableCell className="text-theme-sm px-5 py-4 text-start">
                       <div className="flex gap-2">
                         <button
                           onClick={() => {
@@ -160,7 +184,9 @@ export default function VolumeTable() {
             </TableBody>
           </Table>
           {error && (
-            <div className="p-4 text-red-500 font-medium text-sm">Error: {error}</div>
+            <div className="p-4 text-sm font-medium text-red-500">
+              Error: {error}
+            </div>
           )}
           <div className="flex justify-end p-4">
             <Pagination

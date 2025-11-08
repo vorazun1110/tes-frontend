@@ -17,7 +17,12 @@ import { Pencil, Trash2 } from "lucide-react";
 import { useConfirmDialog } from "@/hooks/useConfirmDialog";
 import ConfirmDialog from "../ui/modal/ConfirmDialog";
 import LocationFormModal from "./Modal";
-import { createLocation, deleteLocation, fetchLocations, updateLocation } from "@/services/location";
+import {
+  createLocation,
+  deleteLocation,
+  fetchLocations,
+  updateLocation,
+} from "@/services/location";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -37,7 +42,7 @@ export default function LocationTable() {
     handleConfirm: confirmDelete,
   } = useConfirmDialog();
 
-  const rowsPerPage = 5;
+  const rowsPerPage = 10;
 
   useEffect(() => {
     fetchLocations()
@@ -47,7 +52,7 @@ export default function LocationTable() {
 
   const filteredLocations = useMemo(() => {
     return locations.filter((location) =>
-      location.name.toLowerCase().includes(search.toLowerCase())
+      location.name.toLowerCase().includes(search.toLowerCase()),
     );
   }, [locations, search]);
 
@@ -63,7 +68,7 @@ export default function LocationTable() {
       if (editLocation) {
         const res = await updateLocation(editLocation.id, payload);
         setLocations((prev) =>
-          prev.map((d) => (d.id === editLocation.id ? res.data : d))
+          prev.map((d) => (d.id === editLocation.id ? res.data : d)),
         );
       } else {
         const res = await createLocation(payload);
@@ -120,13 +125,17 @@ export default function LocationTable() {
             Түгээлтийн байршил
           </Link>
 
-          <span className="select-none text-gray-300 dark:text-white/30">|</span>
+          <span className="text-gray-300 select-none dark:text-white/30">
+            |
+          </span>
 
           <Link
             href="/fuel-locations/distances"
             role="tab"
             aria-selected={pathname === "/fuel-locations/distances"}
-            aria-current={pathname === "/fuel-locations/distances" ? "page" : undefined}
+            aria-current={
+              pathname === "/fuel-locations/distances" ? "page" : undefined
+            }
             className={[
               "-mb-[1px] inline-flex items-center rounded-t-lg px-4 py-2 text-sm font-medium transition-colors",
               "text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white",
@@ -142,7 +151,7 @@ export default function LocationTable() {
       </div>
 
       {/* Toolbar (only for location tab) */}
-      <div className="p-4 flex justify-between items-center">
+      <div className="flex items-center justify-between p-4">
         <Input
           type="text"
           placeholder="Утга хайх..."
@@ -172,26 +181,46 @@ export default function LocationTable() {
             <Table>
               <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
                 <TableRow>
-                  <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">#</TableCell>
-                  <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Нэр</TableCell>
-                  <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Байршил</TableCell>
-                  <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Үйлдэл</TableCell>
+                  <TableCell
+                    isHeader
+                    className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+                  >
+                    #
+                  </TableCell>
+                  <TableCell
+                    isHeader
+                    className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+                  >
+                    Нэр
+                  </TableCell>
+                  <TableCell
+                    isHeader
+                    className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+                  >
+                    Байршил
+                  </TableCell>
+                  <TableCell
+                    isHeader
+                    className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+                  >
+                    Үйлдэл
+                  </TableCell>
                 </TableRow>
               </TableHeader>
               <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
                 {paginatedLocations.map((location, index) => {
                   return (
                     <TableRow key={location.id} className="hover:bg-gray-100">
-                      <TableCell className="px-5 py-4 text-start text-theme-sm">
+                      <TableCell className="text-theme-sm px-5 py-4 text-start">
                         {(currentPage - 1) * rowsPerPage + index + 1}
                       </TableCell>
-                      <TableCell className="px-5 py-4 text-start text-theme-sm">
+                      <TableCell className="text-theme-sm px-5 py-4 text-start">
                         {location.name}
                       </TableCell>
-                      <TableCell className="px-5 py-4 text-start text-theme-sm">
-                        {location.latitude}, {location.longitude}
+                      <TableCell className="text-theme-sm px-5 py-4 text-start">
+                        {location.locationName}
                       </TableCell>
-                      <TableCell className="px-5 py-4 text-start text-theme-sm">
+                      <TableCell className="text-theme-sm px-5 py-4 text-start">
                         <div className="flex gap-2">
                           <button
                             onClick={() => {
@@ -224,7 +253,7 @@ export default function LocationTable() {
             </Table>
 
             {error && (
-              <div className="p-4 text-red-500 font-medium text-sm">
+              <div className="p-4 text-sm font-medium text-red-500">
                 Error: {error}
               </div>
             )}

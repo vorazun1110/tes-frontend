@@ -10,7 +10,11 @@ import {
   DeliveryUpsertPayload,
   DeliveryFuelDetailPayload,
 } from "@/types/deliveries";
-import { Location, Driver, Truck, Trailer, FuelType } from "@/types/api";
+import { Driver, Truck, Trailer, FuelType } from "@/types/api";
+import DriverSelect from "../common/DriverSelect";
+import LocationSelect from "../common/LocationSelect";
+import TruckSelect from "../common/TruckSelect";
+import TrailerSelect from "../common/TrailerSelect";
 
 interface DeliveryFormModalProps {
   editDelivery: Delivery | null;
@@ -18,7 +22,6 @@ interface DeliveryFormModalProps {
   onSubmit: (payload: DeliveryUpsertPayload) => Promise<void>;
 
   drivers: Driver[];
-  locations: Location[];
   trucks: Truck[];
   trailers: Trailer[];
   fuelTypes: FuelType[];
@@ -29,7 +32,6 @@ export default function DeliveryFormModal({
   onClose,
   onSubmit,
   drivers,
-  locations,
   trucks,
   trailers,
   fuelTypes,
@@ -41,8 +43,12 @@ export default function DeliveryFormModal({
   const [truckId, setTruckId] = useState<number>(0);
   const [trailerId, setTrailerId] = useState<number>(0);
 
-  const [truckContainers, setTruckContainers] = useState<DeliveryFuelDetailPayload[]>([]);
-  const [trailerContainers, setTrailerContainers] = useState<DeliveryFuelDetailPayload[]>([]);
+  const [truckContainers, setTruckContainers] = useState<
+    DeliveryFuelDetailPayload[]
+  >([]);
+  const [trailerContainers, setTrailerContainers] = useState<
+    DeliveryFuelDetailPayload[]
+  >([]);
 
   // Load edit mode
   useEffect(() => {
@@ -58,14 +64,14 @@ export default function DeliveryFormModal({
         editDelivery.truck.fuelDetails?.map((fd) => ({
           containerId: fd.containerId,
           fuelTypeId: fd.fuelTypeId,
-        })) || []
+        })) || [],
       );
 
       setTrailerContainers(
         editDelivery.trailers?.fuelDetails?.map((fd) => ({
           containerId: fd.containerId,
           fuelTypeId: fd.fuelTypeId,
-        })) || []
+        })) || [],
       );
     } else {
       const today = dayjs().format("YYYY-MM-DD");
@@ -80,8 +86,14 @@ export default function DeliveryFormModal({
     }
   }, [editDelivery]);
 
-  const currentTruck = useMemo(() => trucks.find((t) => t.id === truckId) || null, [trucks, truckId]);
-  const currentTrailer = useMemo(() => trailers.find((t) => t.id === trailerId) || null, [trailers, trailerId]);
+  const currentTruck = useMemo(
+    () => trucks.find((t) => t.id === truckId) || null,
+    [trucks, truckId],
+  );
+  const currentTrailer = useMemo(
+    () => trailers.find((t) => t.id === trailerId) || null,
+    [trailers, trailerId],
+  );
 
   // Auto-fill based on driver
   const handleDriverChange = (value: number) => {
@@ -89,7 +101,8 @@ export default function DeliveryFormModal({
     const driver = drivers.find((d) => d.id === value);
     if (driver?.truck) {
       setTruckId(driver.truck.id);
-      const trailerId = driver.truck.trailer?.id || driver.truck.trailer_id || 0;
+      const trailerId =
+        driver.truck.trailer?.id || driver.truck.trailer_id || 0;
       setTrailerId(trailerId);
 
       const truckFromList = trucks.find((t) => t.id === driver.truck!.id);
@@ -98,7 +111,7 @@ export default function DeliveryFormModal({
           truckFromList.containers.map((c) => ({
             containerId: c.id,
             fuelTypeId: fuelTypes?.[0]?.id || 1,
-          }))
+          })),
         );
       }
     } else {
@@ -119,7 +132,7 @@ export default function DeliveryFormModal({
         truck.containers.map((c) => ({
           containerId: c.id,
           fuelTypeId: fuelTypes?.[0]?.id || 1,
-        }))
+        })),
       );
     } else setTruckContainers([]);
   };
@@ -132,32 +145,44 @@ export default function DeliveryFormModal({
         trailer?.containers?.map((c) => ({
           containerId: c.id || 0,
           fuelTypeId: fuelTypes?.[0]?.id || 1,
-        }))
+        })),
       );
     } else setTrailerContainers([]);
   };
 
   // Utility methods
-  const handleContainerAdd = (target: "truck" | "trailer", containerId: number) => {
-    const updater = target === "truck" ? setTruckContainers : setTrailerContainers;
+  const handleContainerAdd = (
+    target: "truck" | "trailer",
+    containerId: number,
+  ) => {
+    const updater =
+      target === "truck" ? setTruckContainers : setTrailerContainers;
     const state = target === "truck" ? truckContainers : trailerContainers;
 
     if (state.some((c) => c.containerId === containerId)) return;
-    updater([
-      ...state,
-      { containerId, fuelTypeId: fuelTypes?.[0]?.id || 1 },
-    ]);
+    updater([...state, { containerId, fuelTypeId: fuelTypes?.[0]?.id || 1 }]);
   };
 
-  const handleContainerRemove = (target: "truck" | "trailer", containerId: number) => {
-    const updater = target === "truck" ? setTruckContainers : setTrailerContainers;
+  const handleContainerRemove = (
+    target: "truck" | "trailer",
+    containerId: number,
+  ) => {
+    const updater =
+      target === "truck" ? setTruckContainers : setTrailerContainers;
     updater((prev) => prev.filter((c) => c.containerId !== containerId));
   };
 
-  const handleFuelTypeChange = (target: "truck" | "trailer", containerId: number, fuelTypeId: number) => {
-    const updater = target === "truck" ? setTruckContainers : setTrailerContainers;
+  const handleFuelTypeChange = (
+    target: "truck" | "trailer",
+    containerId: number,
+    fuelTypeId: number,
+  ) => {
+    const updater =
+      target === "truck" ? setTruckContainers : setTrailerContainers;
     updater((prev) =>
-      prev.map((c) => (c.containerId === containerId ? { ...c, fuelTypeId } : c))
+      prev.map((c) =>
+        c.containerId === containerId ? { ...c, fuelTypeId } : c,
+      ),
     );
   };
 
@@ -173,8 +198,8 @@ export default function DeliveryFormModal({
       },
       trailer: {
         id: trailerId,
-        fuelDetails: trailerContainers
-      }
+        fuelDetails: trailerContainers,
+      },
     };
     await onSubmit(payload);
     onClose();
@@ -184,9 +209,9 @@ export default function DeliveryFormModal({
     title: string,
     target: "truck" | "trailer",
     containers: DeliveryFuelDetailPayload[],
-    available: { id: number; volume: number }[] = []
+    available: { id: number; volume: number }[] = [],
   ) => (
-    <div className="space-y-3 border border-gray-300 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-900/30">
+    <div className="space-y-3 rounded-lg border border-gray-300 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900/30">
       <h3 className="text-base font-semibold text-black">{title}</h3>
 
       {containers.length === 0 ? (
@@ -196,16 +221,22 @@ export default function DeliveryFormModal({
           {containers.map((c) => (
             <div
               key={c.containerId}
-              className="flex items-center justify-between bg-white/10 px-3 py-2 rounded-md dark:bg-white/5"
+              className="flex items-center justify-between rounded-md bg-white/10 px-3 py-2 dark:bg-white/5"
             >
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                <span className="text-sm text-black dark:text-white/90 font-medium">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                <span className="text-sm font-medium text-black dark:text-white/90">
                   Лүүк ID: {c.containerId}
                 </span>
                 <select
                   value={c.fuelTypeId}
-                  onChange={(e) => handleFuelTypeChange(target, c.containerId, Number(e.target.value))}
-                  className="h-9 rounded-md border px-2 text-sm bg-transparent text-black dark:text-white border-gray-600 dark:border-gray-500"
+                  onChange={(e) =>
+                    handleFuelTypeChange(
+                      target,
+                      c.containerId,
+                      Number(e.target.value),
+                    )
+                  }
+                  className="h-9 rounded-md border border-gray-600 bg-transparent px-2 text-sm text-black dark:border-gray-500 dark:text-white"
                 >
                   {fuelTypes.map((ft) => (
                     <option key={ft.id} value={ft.id}>
@@ -229,7 +260,7 @@ export default function DeliveryFormModal({
       {available.length > 0 && (
         <div className="mt-3">
           <Label className="text-sm text-white/80">Нэмэх боломжтой</Label>
-          <div className="flex flex-wrap gap-2 mt-1">
+          <div className="mt-1 flex flex-wrap gap-2">
             {available
               .filter((a) => !containers.some((c) => c.containerId === a.id))
               .map((a) => (
@@ -254,7 +285,7 @@ export default function DeliveryFormModal({
         {editDelivery ? "Хүргэлт засах" : "Хүргэлт нэмэх"}
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div>
           <Label htmlFor="date">Огноо</Label>
           <DatePicker
@@ -265,99 +296,53 @@ export default function DeliveryFormModal({
           />
         </div>
 
-        <div>
-          <Label htmlFor="driver">Жолооч</Label>
-          <select
-            id="driver"
-            value={driverId}
-            onChange={(e) => handleDriverChange(Number(e.target.value))}
-            className="h-11 w-full rounded-lg border px-4 py-2.5 text-sm bg-transparent text-gray-800 dark:text-white dark:bg-gray-900 border-gray-300 dark:border-gray-700"
-          >
-            <option value={0}>Сонгох...</option>
-            {drivers.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.lastname} {d.firstname}
-              </option>
-            ))}
-          </select>
-        </div>
+        <DriverSelect
+          value={driverId === 0 ? null : driverId}
+          onChange={handleDriverChange}
+        />
 
-        <div>
-          <Label htmlFor="from-location">Ачилт (хаанаас)</Label>
-          <select
-            id="from-location"
-            value={fromLocationId}
-            onChange={(e) => setFromLocationId(Number(e.target.value))}
-            className="h-11 w-full rounded-lg border px-4 py-2.5 text-sm bg-transparent text-gray-800 dark:text-white dark:bg-gray-900 border-gray-300 dark:border-gray-700"
-          >
-            <option value={0}>Сонгох...</option>
-            {locations.map((l) => (
-              <option key={l.id} value={l.id}>
-                {l.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        <LocationSelect
+          id="from-location"
+          label="Ачилт (хаанаас)"
+          value={fromLocationId}
+          onChange={setFromLocationId}
+        />
 
-        <div>
-          <Label htmlFor="to-location">Хүргэлт (хаашаа)</Label>
-          <select
-            id="to-location"
-            value={toLocationId}
-            onChange={(e) => setToLocationId(Number(e.target.value))}
-            className="h-11 w-full rounded-lg border px-4 py-2.5 text-sm bg-transparent text-gray-800 dark:text-white dark:bg-gray-900 border-gray-300 dark:border-gray-700"
-          >
-            <option value={0}>Сонгох...</option>
-            {locations.map((l) => (
-              <option key={l.id} value={l.id}>
-                {l.name}
-              </option>
-            ))}
-          </select>
-        </div>
+        <LocationSelect
+          id="to-location"
+          label="Хүргэлт (хаашаа)"
+          value={toLocationId}
+          onChange={setToLocationId}
+        />
 
-        <div>
-          <Label htmlFor="truck">Машин</Label>
-          <select
-            id="truck"
-            value={truckId}
-            onChange={(e) => handleTruckChange(Number(e.target.value))}
-            className="h-11 w-full rounded-lg border px-4 py-2.5 text-sm bg-transparent text-gray-800 dark:text-white dark:bg-gray-900 border-gray-300 dark:border-gray-700"
-          >
-            <option value={0}>Сонгох...</option>
-            {trucks.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.license_plate}
-              </option>
-            ))}
-          </select>
-        </div>
+        <TruckSelect value={truckId} onChange={handleTruckChange} />
 
-        <div>
-          <Label htmlFor="trailer">Чиргүүл</Label>
-          <select
-            id="trailer"
-            value={trailerId}
-            onChange={(e) => handleTrailerChange(Number(e.target.value))}
-            className="h-11 w-full rounded-lg border px-4 py-2.5 text-sm bg-transparent text-gray-800 dark:text-white dark:bg-gray-900 border-gray-300 dark:border-gray-700"
-          >
-            <option value={0}>Сонгохгүй</option>
-            {trailers.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.license_plate}
-              </option>
-            ))}
-          </select>
-        </div>
+        <TrailerSelect value={trailerId} onChange={handleTrailerChange} />
       </div>
 
       {/* Separated sections */}
-      <div className="grid md:grid-cols-2 gap-6">
-        {renderContainerSection("Машины Лүүк", "truck", truckContainers, currentTruck?.containers?.map((c) => ({ id: c.id || 0, volume: c.volume || 0 })))}
-        {renderContainerSection("Чиргүүлийн Лүүк", "trailer", trailerContainers, currentTrailer?.containers?.map((c) => ({ id: c.id || 0, volume: c.volume || 0 })))}
+      <div className="grid gap-6 md:grid-cols-2">
+        {renderContainerSection(
+          "Машины Лүүк",
+          "truck",
+          truckContainers,
+          currentTruck?.containers?.map((c) => ({
+            id: c.id || 0,
+            volume: c.volume || 0,
+          })),
+        )}
+        {renderContainerSection(
+          "Чиргүүлийн Лүүк",
+          "trailer",
+          trailerContainers,
+          currentTrailer?.containers?.map((c) => ({
+            id: c.id || 0,
+            volume: c.volume || 0,
+          })),
+        )}
       </div>
 
-      <div className="flex justify-end gap-2 mt-6">
+      <div className="mt-6 flex justify-end gap-2">
         <Button variant="outline" onClick={onClose}>
           Болих
         </Button>

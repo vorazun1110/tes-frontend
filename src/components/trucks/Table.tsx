@@ -9,7 +9,12 @@ import {
   TableRow,
 } from "../ui/table";
 import { Truck, TruckPayload } from "@/types/api";
-import { createTruck, deleteTruck, fetchTrucks, updateTruck } from "@/services/truck";
+import {
+  createTruck,
+  deleteTruck,
+  fetchTrucks,
+  updateTruck,
+} from "@/services/truck";
 import { Input } from "../ui/input";
 import Pagination from "../ui/pagination";
 import Modal from "../modal/BasicModal";
@@ -37,7 +42,7 @@ export default function TruckTable() {
     handleConfirm: confirmDelete,
   } = useConfirmDialog();
 
-  const rowsPerPage = 5;
+  const rowsPerPage = 10;
   useEffect(() => {
     fetchTrucks()
       .then((res) => setTrucks(res.data))
@@ -46,7 +51,7 @@ export default function TruckTable() {
 
   const filteredTrucks = useMemo(() => {
     return trucks.filter((truck) =>
-      truck.license_plate.toLowerCase().includes(search.toLowerCase())
+      truck.license_plate.toLowerCase().includes(search.toLowerCase()),
     );
   }, [trucks, search]);
 
@@ -62,7 +67,7 @@ export default function TruckTable() {
       if (editTruck) {
         const res = await updateTruck(editTruck.id, payload);
         setTrucks((prev) =>
-          prev.map((t) => (t.id === editTruck.id ? res.data : t))
+          prev.map((t) => (t.id === editTruck.id ? res.data : t)),
         );
       } else {
         const res = await createTruck(payload);
@@ -89,8 +94,6 @@ export default function TruckTable() {
       else setError("An unknown error occurred");
     }
   };
-
-
 
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
@@ -120,7 +123,9 @@ export default function TruckTable() {
             Ачилтын машин
           </Link>
 
-          <span className="select-none text-gray-300 dark:text-white/30">|</span>
+          <span className="text-gray-300 select-none dark:text-white/30">
+            |
+          </span>
 
           <Link
             href="/trailers"
@@ -140,7 +145,7 @@ export default function TruckTable() {
           </Link>
         </div>
       </div>
-      <div className="p-4 flex justify-between items-center">
+      <div className="flex items-center justify-between p-4">
         <Input
           type="text"
           placeholder="Улсын дугаар хайх..."
@@ -151,7 +156,13 @@ export default function TruckTable() {
           }}
           className="w-full max-w-sm"
         />
-        <Button className="ml-4" onClick={() => { setEditTruck(null); setIsModalOpen(true); }}>
+        <Button
+          className="ml-4"
+          onClick={() => {
+            setEditTruck(null);
+            setIsModalOpen(true);
+          }}
+        >
           + Нэмэх
         </Button>
       </div>
@@ -159,27 +170,99 @@ export default function TruckTable() {
         <Table className="min-w-[1100px]">
           <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
             <TableRow>
-              <TableCell isHeader rowSpan={2} className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">#</TableCell>
-              <TableCell isHeader rowSpan={2} className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Улсын дугаар</TableCell>
-              <TableCell isHeader rowSpan={2} className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Жолооч</TableCell>
+              <TableCell
+                isHeader
+                rowSpan={2}
+                className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+              >
+                #
+              </TableCell>
+              <TableCell
+                isHeader
+                rowSpan={2}
+                className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+              >
+                Улсын дугаар
+              </TableCell>
+              <TableCell
+                isHeader
+                rowSpan={2}
+                className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+              >
+                Жолооч
+              </TableCell>
 
-              <TableCell isHeader colSpan={4} className="px-5 py-3 text-gray-500 text-center text-theme-xs dark:text-gray-400">
+              <TableCell
+                isHeader
+                colSpan={4}
+                className="text-theme-xs px-5 py-3 text-center text-gray-500 dark:text-gray-400"
+              >
                 Багтаамж
               </TableCell>
 
-              <TableCell isHeader rowSpan={2} className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Чиргүүл</TableCell>
+              <TableCell
+                isHeader
+                rowSpan={2}
+                className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+              >
+                Чиргүүл
+              </TableCell>
 
-              <TableCell isHeader rowSpan={2} className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Дугуйн гүйлт</TableCell>
-              <TableCell isHeader rowSpan={2} className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Аккумулятор солих хугацаа</TableCell>
-              <TableCell isHeader rowSpan={2} className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Үзлэгийн хугацаа</TableCell>
-              <TableCell isHeader rowSpan={2} className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Үйлдэл</TableCell>
+              <TableCell
+                isHeader
+                rowSpan={2}
+                className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+              >
+                Дугуйн гүйлт
+              </TableCell>
+              <TableCell
+                isHeader
+                rowSpan={2}
+                className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+              >
+                Аккумулятор солих хугацаа
+              </TableCell>
+              <TableCell
+                isHeader
+                rowSpan={2}
+                className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+              >
+                Үзлэгийн хугацаа
+              </TableCell>
+              <TableCell
+                isHeader
+                rowSpan={2}
+                className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+              >
+                Үйлдэл
+              </TableCell>
             </TableRow>
 
             <TableRow>
-              <TableCell isHeader className="px-5 py-3 text-gray-500 text-center text-theme-xs dark:text-gray-400">Лүүк 1</TableCell>
-              <TableCell isHeader className="px-5 py-3 text-gray-500 text-center text-theme-xs dark:text-gray-400">Лүүк 2</TableCell>
-              <TableCell isHeader className="px-5 py-3 text-gray-500 text-center text-theme-xs dark:text-gray-400">Лүүк 3</TableCell>
-              <TableCell isHeader className="px-5 py-3 text-gray-500 text-center text-theme-xs dark:text-gray-400">Лүүк 4</TableCell>
+              <TableCell
+                isHeader
+                className="text-theme-xs px-5 py-3 text-center text-gray-500 dark:text-gray-400"
+              >
+                Лүүк 1
+              </TableCell>
+              <TableCell
+                isHeader
+                className="text-theme-xs px-5 py-3 text-center text-gray-500 dark:text-gray-400"
+              >
+                Лүүк 2
+              </TableCell>
+              <TableCell
+                isHeader
+                className="text-theme-xs px-5 py-3 text-center text-gray-500 dark:text-gray-400"
+              >
+                Лүүк 3
+              </TableCell>
+              <TableCell
+                isHeader
+                className="text-theme-xs px-5 py-3 text-center text-gray-500 dark:text-gray-400"
+              >
+                Лүүк 4
+              </TableCell>
             </TableRow>
           </TableHeader>
 
@@ -187,40 +270,41 @@ export default function TruckTable() {
             {paginatedTrucks.map((truck, index) => {
               return (
                 <TableRow key={truck.id} className="hover:bg-gray-100">
-                  <TableCell className="px-5 py-4 text-start text-theme-sm">
+                  <TableCell className="text-theme-sm px-5 py-4 text-start">
                     {(currentPage - 1) * rowsPerPage + index + 1}
                   </TableCell>
-                  <TableCell className="px-5 py-4 text-start text-theme-sm">
+                  <TableCell className="text-theme-sm px-5 py-4 text-start">
                     {truck.license_plate}
                   </TableCell>
-                  <TableCell className="px-5 py-4 text-start text-theme-sm">
-                    {truck.driver?.firstname || ''}{' '}{truck.driver?.lastname || ''}
+                  <TableCell className="text-theme-sm px-5 py-4 text-start">
+                    {truck.driver?.firstname || ""}{" "}
+                    {truck.driver?.lastname || ""}
                   </TableCell>
-                  <TableCell className="px-5 py-4 text-start text-theme-sm">
-                    {truck.containers[0]?.volume || '-'}
+                  <TableCell className="text-theme-sm px-5 py-4 text-start">
+                    {truck.containers[0]?.volume || "-"}
                   </TableCell>
-                  <TableCell className="px-5 py-4 text-start text-theme-sm">
-                    {truck.containers[1]?.volume || '-'}
+                  <TableCell className="text-theme-sm px-5 py-4 text-start">
+                    {truck.containers[1]?.volume || "-"}
                   </TableCell>
-                  <TableCell className="px-5 py-4 text-start text-theme-sm">
-                    {truck.containers[2]?.volume || '-'}
+                  <TableCell className="text-theme-sm px-5 py-4 text-start">
+                    {truck.containers[2]?.volume || "-"}
                   </TableCell>
-                  <TableCell className="px-5 py-4 text-start text-theme-sm">
-                    {truck.containers[3]?.volume || '-'}
+                  <TableCell className="text-theme-sm px-5 py-4 text-start">
+                    {truck.containers[3]?.volume || "-"}
                   </TableCell>
-                  <TableCell className="px-5 py-4 text-start text-theme-sm">
-                    {truck.trailer?.license_plate || '-'}
+                  <TableCell className="text-theme-sm px-5 py-4 text-start">
+                    {truck.trailer?.license_plate || "-"}
                   </TableCell>
-                  <TableCell className="px-5 py-4 text-start text-theme-sm">
-                    {truck.tire_wear || '-'}
+                  <TableCell className="text-theme-sm px-5 py-4 text-start">
+                    {truck.tire_wear || "-"}
                   </TableCell>
-                  <TableCell className="px-5 py-4 text-start text-theme-sm">
-                    {truck.last_battery_changed_at || '-'}
+                  <TableCell className="text-theme-sm px-5 py-4 text-start">
+                    {truck.last_battery_changed_at || "-"}
                   </TableCell>
-                  <TableCell className="px-5 py-4 text-start text-theme-sm">
-                    {truck.last_inspected_at || '-'}
+                  <TableCell className="text-theme-sm px-5 py-4 text-start">
+                    {truck.last_inspected_at || "-"}
                   </TableCell>
-                  <TableCell className="px-5 py-4 text-start text-theme-sm">
+                  <TableCell className="text-theme-sm px-5 py-4 text-start">
                     <div className="flex gap-2">
                       <button
                         onClick={() => {
@@ -252,7 +336,9 @@ export default function TruckTable() {
           </TableBody>
         </Table>
         {error && (
-          <div className="p-4 text-red-500 font-medium text-sm">Error: {error}</div>
+          <div className="p-4 text-sm font-medium text-red-500">
+            Error: {error}
+          </div>
         )}
         <div className="flex justify-end p-4">
           <Pagination

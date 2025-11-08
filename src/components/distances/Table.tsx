@@ -17,7 +17,12 @@ import { Pencil, Trash2 } from "lucide-react";
 import { useConfirmDialog } from "@/hooks/useConfirmDialog";
 import ConfirmDialog from "../ui/modal/ConfirmDialog";
 import DistanceFormModal from "./Modal";
-import { createDistance, deleteDistance, fetchDistances, updateDistance } from "@/services/distance";
+import {
+  createDistance,
+  deleteDistance,
+  fetchDistances,
+  updateDistance,
+} from "@/services/distance";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -37,7 +42,7 @@ export default function DistanceTable() {
     handleConfirm: confirmDelete,
   } = useConfirmDialog();
 
-  const rowsPerPage = 5;
+  const rowsPerPage = 10;
 
   useEffect(() => {
     fetchDistances()
@@ -47,7 +52,9 @@ export default function DistanceTable() {
 
   const filteredDistances = useMemo(() => {
     return distances.filter((distance) =>
-      distance.name.toLowerCase().includes(search.toLowerCase())
+      distance.locationDistanceName
+        .toLowerCase()
+        .includes(search.toLowerCase()),
     );
   }, [distances, search]);
 
@@ -63,7 +70,7 @@ export default function DistanceTable() {
       if (editDistance) {
         const res = await updateDistance(editDistance.id, payload);
         setDistances((prev) =>
-          prev.map((d) => (d.id === editDistance.id ? res.data : d))
+          prev.map((d) => (d.id === editDistance.id ? res.data : d)),
         );
       } else {
         const res = await createDistance(payload);
@@ -120,13 +127,17 @@ export default function DistanceTable() {
             Түгээлтийн байршил
           </Link>
 
-          <span className="select-none text-gray-300 dark:text-white/30">|</span>
+          <span className="text-gray-300 select-none dark:text-white/30">
+            |
+          </span>
 
           <Link
             href="/fuel-locations/distances"
             role="tab"
             aria-selected={pathname === "/fuel-locations/distances"}
-            aria-current={pathname === "/fuel-locations/distances" ? "page" : undefined}
+            aria-current={
+              pathname === "/fuel-locations/distances" ? "page" : undefined
+            }
             className={[
               "-mb-[1px] inline-flex items-center rounded-t-lg px-4 py-2 text-sm font-medium transition-colors",
               "text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white",
@@ -142,7 +153,7 @@ export default function DistanceTable() {
       </div>
 
       {/* Toolbar (only for distance tab) */}
-      <div className="p-4 flex justify-between items-center">
+      <div className="flex items-center justify-between p-4">
         <Input
           type="text"
           placeholder="Утга хайх..."
@@ -172,31 +183,56 @@ export default function DistanceTable() {
             <Table>
               <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
                 <TableRow>
-                  <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">#</TableCell>
-                  <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Нэр</TableCell>
-                  <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Байршил</TableCell>
-                  <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Зай</TableCell>
-                  <TableCell isHeader className="px-5 py-3 text-gray-500 text-start text-theme-xs dark:text-gray-400">Үйлдэл</TableCell>
+                  <TableCell
+                    isHeader
+                    className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+                  >
+                    #
+                  </TableCell>
+                  <TableCell
+                    isHeader
+                    className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+                  >
+                    Нэр
+                  </TableCell>
+                  <TableCell
+                    isHeader
+                    className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+                  >
+                    Байршил
+                  </TableCell>
+                  <TableCell
+                    isHeader
+                    className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+                  >
+                    Зай
+                  </TableCell>
+                  <TableCell
+                    isHeader
+                    className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
+                  >
+                    Үйлдэл
+                  </TableCell>
                 </TableRow>
               </TableHeader>
               <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
                 {paginatedDistances.map((distance, index) => {
                   return (
                     <TableRow key={distance.id} className="hover:bg-gray-100">
-                      <TableCell className="px-5 py-4 text-start text-theme-sm">
+                      <TableCell className="text-theme-sm px-5 py-4 text-start">
                         {(currentPage - 1) * rowsPerPage + index + 1}
                       </TableCell>
-                      <TableCell className="px-5 py-4 text-start text-theme-sm">
-                        {distance.name}
+                      <TableCell className="text-theme-sm px-5 py-4 text-start">
+                        {distance.locationDistanceName}
                       </TableCell>
-                      <TableCell className="px-5 py-4 text-start text-theme-sm">
+                      <TableCell className="text-theme-sm px-5 py-4 text-start">
                         {distance?.location1?.name}
                         {distance?.location2?.name}
                       </TableCell>
-                      <TableCell className="px-5 py-4 text-start text-theme-sm">
+                      <TableCell className="text-theme-sm px-5 py-4 text-start">
                         {distance.distance} км
                       </TableCell>
-                      <TableCell className="px-5 py-4 text-start text-theme-sm">
+                      <TableCell className="text-theme-sm px-5 py-4 text-start">
                         <div className="flex gap-2">
                           <button
                             onClick={() => {
@@ -229,7 +265,7 @@ export default function DistanceTable() {
             </Table>
 
             {error && (
-              <div className="p-4 text-red-500 font-medium text-sm">
+              <div className="p-4 text-sm font-medium text-red-500">
                 Error: {error}
               </div>
             )}
@@ -259,6 +295,6 @@ export default function DistanceTable() {
           </>
         </div>
       </div>
-    </div >
+    </div>
   );
 }
