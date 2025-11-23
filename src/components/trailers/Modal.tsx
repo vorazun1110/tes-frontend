@@ -25,7 +25,7 @@ export default function TrailerFormModal({ editTrailer, onClose, onSubmit }: Tra
   }, [editTrailer]);
 
   const handleAddContainer = () => {
-    setContainers((prev) => [...prev, { volume: null }]);
+    setContainers((prev) => [...prev, { id: 0, volume: null }]);
   };
 
   const handleChangeContainer = (index: number, volume: number | null) => {

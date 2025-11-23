@@ -1,12 +1,12 @@
 export interface Container {
   volume: number | null;
-  id?: number;
+  id: number;
 }
 
 export interface Truck {
   id: number;
   license_plate: string;
-  containers: TruckContainer[];
+  containers: VehicleContainer[];
   tire_wear: number;
   last_battery_changed_at: string;
   last_inspected_at: string;
@@ -16,13 +16,18 @@ export interface Truck {
   trailer?: {
     id: number;
     license_plate: string;
-    containers: TruckContainer[];
+    containers: VehicleContainer[];
   };
 }
 
-export interface TruckContainer {
+export interface VehicleContainer {
   id: number;
   volume: number | null;
+}
+
+export interface SelectedContainer {
+  containerId: number;
+  fuelTypeId?: number;
 }
 
 export interface TruckPayload {
@@ -257,4 +262,14 @@ export interface ReportMeta {
   };
   totalDeliveries: number;
   generatedAt: string;
+}
+
+export interface Status {
+  id: number;
+  name: string;
+  color: string;
+}
+
+export interface StatusPayload {
+  statusId: number;
 }

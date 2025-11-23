@@ -1,18 +1,35 @@
-export interface DeliveriesApiResponse {
-    success: boolean;
-    message: string;
-    data: Delivery[];
+import { Container, FuelType, Status } from "./api";
+
+export interface DailyDeliveryResponse {
+    result: DailyDelivery[];
+    count: number;
+}
+export interface DailyDelivery {
+    daily_delivery_id: number;
+    driver: Driver;
+    truck: Truck;
+    trailer: Trailer;
+    leave_status: string
+    leave_status_id: number;
+    deliveries: Delivery[]
 }
 
 export interface Delivery {
     id: number;
-    date: string;
+    manager_status_id: number;
+    manager_status: string;
     driver: Driver;
-    fromLocation: LocationPoint;
-    toLocation: LocationPoint;
-    truck: Vehicle;
-    trailers: Vehicle;
-    is_received: boolean;
+    trailer: Trailer;
+    from_location: LocationPoint;
+    location_details: LocationDetail[];
+}
+export interface LocationDetail {
+    location_id: number;
+    location: LocationPoint;
+    inspector_status: string;
+    inspector_status_id: number;
+    received_at: string | null;
+    receiver: Receiver;
 }
 
 export interface Driver {
@@ -30,58 +47,95 @@ export interface LocationPoint {
     name: string;
     latitude: number;
     longitude: number;
+    location: string;
+    district: string;
+    type: "from" | "to";
 }
 
-export interface Vehicle {
+export interface Truck {
     id: number;
-    licensePlate: string;
-    fuelDetails: FuelDetail[];
+    license_plate: string;
+    status: string;
+    status_id: number;
 }
 
-export interface FuelDetail {
+export interface Trailer {
     id: number;
-    fuelType: string;
-    fuelTypeId: number;
-    volume?: number;
-    containerId: number;
-    density?: number | null;
+    license_plate: string;
 }
 
+export interface Receiver {
+    id: number;
+    username: string;
+    password: string;
+    role: string;
+    location_id: number | null;
+    firstname: string;
+    lastname: string;
+}
+
+export interface DailyData {
+    truck_id: number;
+    trailer_id?: number;
+    driver_id: number;
+}
+
+/* Delivery actions */
 export interface DeliveryUpsertPayload {
     date: string;
-    driverId: number;
     fromLocationId: number;
-    toLocationId: number;
-    truck: DeliveryVehiclePayload;
-    trailer?: DeliveryVehiclePayload;
+    toLocationIds: number[];
+    driverId: number;
+    truck: VehiclePayload;
+    trailer?: VehiclePayload;
+    dailyDeliveryId?: number;
 }
 
-export interface DeliveryVehiclePayload {
+export interface VehiclePayload {
     id: number;
-    fuelDetails: DeliveryFuelDetailPayload[];
+    fuelDetails: FuelDetailPayload[];
 }
-
-export interface DeliveryFuelDetailPayload {
+export interface FuelDetailPayload {
     containerId: number;
-    fuelTypeId: number;
+    fuelTypeId?: number | null;
 }
 
+/* Receive actions */
 export interface DeliveryReceivePayload {
-    outboundDistanceId: number;
-    returnDistanceId: number;
-    densityDetails: DensityDetail[];
+    fromDistanceId: number;
+    toDistanceId: number;
+    densityDetails: DensityDetailPayload[];
 }
-
-export interface DensityDetail {
+export interface DensityDetailPayload {
     detailId: number;
     density: number;
 }
 
-export interface DeliveryFuelDetail {
+/* Detail */
+export interface DeliveryDetail {
     id: number;
-    fuelType: string;
-    fuelTypeId: number;
-    volume?: number;
-    containerId: number;
-    density?: number | null;
+    daily_delivery_id: number;
+    driver_id: number;
+    trailer_id: number;
+    from_location_id: number;
+    delivery_locations: number[];
+    manager_status_id: number;
+    truck: Vehicle;
+    trailer: Vehicle;
+}
+
+export interface Vehicle {
+    id: number;
+    details: VehicleDetail[];
+}
+export interface VehicleDetail {
+    id: number;
+    fuel_type: FuelType;
+    container: Container;
+    to_location: LocationPoint;
+    density: number;
+    inspector_status: Status;
+    inspector_status_id: number;
+    received_at: string;
+    receiver: Receiver;
 }

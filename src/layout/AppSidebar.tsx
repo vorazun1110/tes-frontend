@@ -17,8 +17,7 @@ import {
   ChevronDownIcon,
   HorizontaLDots,
 } from "../icons/index";
-import type { User as UserType } from "@/types/api";
-import { getToken, getUserFromToken } from "@/lib/auth";
+import { useSessionUser } from "@/hooks";
 
 
 type NavItem = {
@@ -36,7 +35,7 @@ const inspectorNavItems: NavItem[] = [
   },
   {
     icon: <Fuel />,
-    name: "Түгээлт",
+    name: "Гаралтийн мэдээлэл",
     path: "/deliveries",
   },
 ];
@@ -49,7 +48,7 @@ const managerNavItems: NavItem[] = [
   },
   {
     icon: <Fuel />,
-    name: "Түгээлт",
+    name: "Гаралтийн мэдээлэл",
     path: "/deliveries",
   },
 ];
@@ -62,7 +61,7 @@ const adminNavItems: NavItem[] = [
   },
   {
     icon: <Fuel />,
-    name: "Түгээлт",
+    name: "Гаралтийн мэдээлэл",
     path: "/deliveries",
   },
   {
@@ -87,16 +86,14 @@ const adminNavItems: NavItem[] = [
   },
   {
     icon: <Timer />,
-    name: "Цагийн бүртгэл",
+    name: "Жолоочийн тооцоо",
     path: "/report",
   },
 
 ];
 
 const AppSidebar: React.FC = () => {
-  // const { user } = useAuth();
-  const token = getToken();
-  const user = getUserFromToken<UserType>(token) ?? null;
+  const user = useSessionUser();
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
 

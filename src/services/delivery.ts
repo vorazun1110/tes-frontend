@@ -1,9 +1,9 @@
 import { apiGet, apiAction } from "@/lib/api";
-import { Delivery, DeliveryReceivePayload, DeliveryUpsertPayload } from "@/types/deliveries";
+import { DailyDeliveryResponse, Delivery, DeliveryDetail, DeliveryReceivePayload, DeliveryUpsertPayload } from "@/types/deliveries";
 import { ApiResponse } from "@/types/api";
 
-export async function fetchDeliveries(dateFrom: string, dateTo: string, isReceived: string): Promise<ApiResponse<Delivery[]>> {
-  return await apiGet<ApiResponse<Delivery[]>>(`/deliveries?startDate=${dateFrom}&endDate=${dateTo}&is_received=${isReceived}`);
+export async function fetchDeliveries(date: string): Promise<ApiResponse<DailyDeliveryResponse>> {
+  return await apiGet<ApiResponse<DailyDeliveryResponse>>(`/deliveries?date=${date}`);
 }
 
 export async function updateDelivery(
@@ -21,9 +21,10 @@ export async function deleteDelivery(deliveryId: number): Promise<ApiResponse<nu
   return await apiAction<ApiResponse<null>>(`/deliveries/${deliveryId}`, "DELETE");
 }
 
-export async function receiveDeliveryApiCall(deliveryId: number | null, payload: DeliveryReceivePayload): Promise<ApiResponse<Delivery>> {
-  if (!deliveryId) {
-    throw new Error("Delivery ID is required");
-  }
+export async function receiveDelivery(deliveryId: number, payload: DeliveryReceivePayload): Promise<ApiResponse<Delivery>> {
   return await apiAction<ApiResponse<Delivery>>(`/deliveries/receive/${deliveryId}`, "POST", payload);
+}
+
+export async function getDelivery(deliveryId: number): Promise<ApiResponse<DeliveryDetail>> {
+  return await apiGet<ApiResponse<DeliveryDetail>>(`/deliveries/${deliveryId}`);
 }

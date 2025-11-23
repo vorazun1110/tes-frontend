@@ -27,7 +27,7 @@ export default function AdminLayout({
   const pathname = usePathname();
 
   // Guard: block render until we know auth state on the client
-  const [ready, setReady] = React.useState(false);
+  // const [ready, setReady] = React.useState(false);
 
   React.useEffect(() => {
     // Runs only on client
@@ -36,7 +36,7 @@ export default function AdminLayout({
       router.replace(`/signin?next=${to}`);
       return;
     }
-    setReady(true);
+    // setReady(true);
   }, [router, pathname]);
 
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
@@ -48,14 +48,14 @@ export default function AdminLayout({
       ? "lg:ml-[290px]"
       : "lg:ml-[90px]";
 
-  if (!ready) {
-    // Skeleton while checking auth (prevents unauthenticated flash)
-    return (
-      <div className="min-h-screen flex items-center justify-center text-gray-500">
-        Ачааллаж байна…
-      </div>
-    );
-  }
+  // if (!ready) {
+  //   // Skeleton while checking auth (prevents unauthenticated flash)
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center text-gray-500">
+  //       Ачааллаж байна…
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="min-h-screen xl:flex">

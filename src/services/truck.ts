@@ -5,6 +5,10 @@ export async function fetchTrucks(): Promise<ApiResponse<Truck[]>> {
   return await apiGet<ApiResponse<Truck[]>>("/trucks");
 }
 
+export async function fetchReadyTrucks(): Promise<ApiResponse<Truck[]>> {
+  return await apiGet<ApiResponse<Truck[]>>("/trucks/ready");
+}
+
 export async function updateTruck(
   truckId: number,
   payload: Partial<TruckPayload>

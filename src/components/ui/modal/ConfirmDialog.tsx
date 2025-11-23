@@ -24,8 +24,8 @@ export default function ConfirmDialog({
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="p-6 text-center">
-        <h3 className="text-lg font-medium text-white">{title}</h3>
-        <p className="text-sm text-white mt-2">{description}</p>
+        <h3 className="text-lg font-medium">{title}</h3>
+        <p className="text-sm mt-2">{description}</p>
         <div className="mt-6 flex justify-center gap-4">
           <Button variant="outline" onClick={onClose}>
             {cancelText}

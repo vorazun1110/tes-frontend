@@ -4,6 +4,7 @@ import React, { ReactNode } from "react";
 interface TableProps {
   children: ReactNode; // Table content (thead, tbody, etc.)
   className?: string; // Optional className for styling
+  style?: React.CSSProperties; // Optional style for the table
 }
 
 // Props for TableHeader
@@ -31,11 +32,12 @@ interface TableCellProps {
   className?: string; // Optional className for styling
   rowSpan?: number; // If > 1, renders as <th> or <td> with row span
   colSpan?: number; // If > 1, renders as <th> or <td> with column span
+  style?: React.CSSProperties; // Optional style for the cell
 }
 
 // Table Component
-const Table: React.FC<TableProps> = ({ children, className }) => {
-  return <table className={`min-w-full  ${className}`}>{children}</table>;
+const Table: React.FC<TableProps> = ({ children, className, style }) => {
+  return <table className={`min-w-full  ${className}`} style={style}>{children}</table>;
 };
 
 // TableHeader Component
@@ -60,9 +62,10 @@ const TableCell: React.FC<TableCellProps> = ({
   rowSpan,
   colSpan,
   className = "",
+  style,
 }) => {
   const commonClasses =
-    "px-5 py-3 text-start align-middle whitespace-nowrap text-theme-sm";
+    "align-middle whitespace-nowrap";
 
   if (isHeader) {
     return (
@@ -71,6 +74,7 @@ const TableCell: React.FC<TableCellProps> = ({
         rowSpan={rowSpan}
         colSpan={colSpan}
         scope="col"
+        style={style}
       >
         {children}
       </th>
@@ -82,6 +86,7 @@ const TableCell: React.FC<TableCellProps> = ({
       className={`${commonClasses} ${className}`}
       rowSpan={rowSpan}
       colSpan={colSpan}
+      style={style}
     >
       {children}
     </td>

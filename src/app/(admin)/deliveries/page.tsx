@@ -1,7 +1,7 @@
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import DeliveryTable from "@/components/deliveries/Table";
+import DeliveryDashboard from "@/components/deliveries/TableDashboard";
 import { Metadata } from "next";
-import React from "react";
+import React, { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "TM Oil Trans | Түгээлт",
@@ -11,10 +11,12 @@ export const metadata: Metadata = {
 
 export default function BasicTables() {
   return (
-    <div>
+    <div className="w-full max-w-full overflow-hidden">
       <PageBreadcrumb pageTitle="Түгээлт" />
-      <div className="space-y-6">
-        <DeliveryTable />
+      <div className="space-y-6 w-full max-w-full">
+        <Suspense fallback={<div>Loading...</div>}>
+          <DeliveryDashboard />
+        </Suspense>
       </div>
     </div>
   );
