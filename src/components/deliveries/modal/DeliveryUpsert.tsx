@@ -42,7 +42,7 @@ export default function DeliveryFormModal({
   toLocations = [],
 }: DeliveryFormModalProps) {
   const [driverId, setDriverId] = useState<number | null>(null);
-  const [fromLocationId, setFromLocationId] = useState<number>(1);
+  const [fromLocationId, setFromLocationId] = useState<number | null>(1);
   const [toLocationIds, setToLocationIds] = useState<number[]>([]);
   const [truckId, setTruckId] = useState<number | null>(null);
   const [trailerId, setTrailerId] = useState<number | null>(null);
@@ -112,16 +112,20 @@ export default function DeliveryFormModal({
   const currentTruck = useMemo(() => trucks.find((t) => t.id === truckId), [trucks, truckId]);
   const currentTrailer = useMemo(() => trailers.find((t) => t.id === trailerId), [trailers, trailerId]);
 
-  const handleDriverChange = (id: number) => {
+  const handleDriverChange = (id: number | null) => {
     setDriverId(id);
     setErrors({ ...errors, driverId: false });
+
+    if (!id) return;
     const driver = drivers.find((d) => d.id === id);
     if (driver?.truck_id) setTruckId(driver.truck_id);
   };
 
-  const handleTruckChange = (id: number) => {
+  const handleTruckChange = (id: number | null) => {
     setTruckId(id);
     setErrors((prev) => ({ ...prev, truckId: false }));
+
+    if (!id) return;
 
     const truck = trucks.find((t) => t.id === id);
     if (!truck) return;
@@ -136,11 +140,14 @@ export default function DeliveryFormModal({
     );
   };
 
-  const handleTrailerChange = (id: number) => {
+  const handleTrailerChange = (id: number | null) => {
     setTrailerId(id);
 
     const trailer = trailers.find((t) => t.id === id);
-    if (!trailer) return;
+    if (!trailer || !id) {
+      setTrailerContainers([]);
+      return;
+    }
 
     setTrailerContainers(
       trailer.containers?.map((c) => ({
@@ -150,7 +157,7 @@ export default function DeliveryFormModal({
     );
   };
 
-  const handleFromLocationChange = (id: number) => {
+  const handleFromLocationChange = (id: number | null) => {
     setFromLocationId(id);
     setErrors((prev) => ({ ...prev, fromLocationId: false }));
   };
@@ -210,7 +217,7 @@ export default function DeliveryFormModal({
     const newErrors = {
       driverId: !driverId,
       fromLocationId: !fromLocationId,
-      toLocationIds: toLocationIds.length === 0,
+      toLocationIds: toLocationIds?.length === 0,
       truckId: !truckId,
       truckFuelError,
       trailerFuelError,
@@ -227,14 +234,14 @@ export default function DeliveryFormModal({
       toLocationIds: toLocationIds,
       truck: {
         id: truckId!,
-        fuelDetails: truckContainers.map((c) => ({
+        fuelDetails: truckContainers?.map((c) => ({
           containerId: c.containerId,
           fuelTypeId: c.fuelTypeId,
         })),
       },
       trailer: trailerId ? {
         id: trailerId,
-        fuelDetails: trailerContainers.map((c) => ({
+        fuelDetails: trailerContainers?.map((c) => ({
           containerId: c.containerId,
           fuelTypeId: c.fuelTypeId,
         })),

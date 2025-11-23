@@ -26,8 +26,8 @@ export default function DeliveryReceiveModal({
   onSubmit,
   distances,
 }: DeliveryReceiveModalProps) {
-  const [outboundDistanceId, setOutboundDistanceId] = useState<number>(0);
-  const [returnDistanceId, setReturnDistanceId] = useState<number>(0);
+  const [outboundDistanceId, setOutboundDistanceId] = useState<number | null>(null);
+  const [returnDistanceId, setReturnDistanceId] = useState<number | null>(null);
   const [densityMap, setDensityMap] = useState<Record<number, string | null>>({});
   const [outboundError, setOutboundError] = useState(false);
   const [returnError, setReturnError] = useState(false);
@@ -75,8 +75,8 @@ export default function DeliveryReceiveModal({
       if (isInvalid) hasDensityError = true;
     });
 
-    const outboundInvalid = outboundDistanceId === 0;
-    const returnInvalid = returnDistanceId === 0;
+    const outboundInvalid = !outboundDistanceId;
+    const returnInvalid = !returnDistanceId;
 
     setDensityErrors(newDensityErrors);
     setOutboundError(outboundInvalid);
@@ -98,12 +98,12 @@ export default function DeliveryReceiveModal({
   };
 
 
-  const handleOutboundDistanceChange = (id: number) => {
+  const handleOutboundDistanceChange = (id: number | null) => {
     setOutboundDistanceId(id);
     setOutboundError(false);
   };
 
-  const handleReturnDistanceChange = (id: number) => {
+  const handleReturnDistanceChange = (id: number | null) => {
     setReturnDistanceId(id);
     setReturnError(false);
   };

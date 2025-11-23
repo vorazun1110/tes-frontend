@@ -12,7 +12,7 @@ interface BaseAutocompleteProps<T> {
     multiple?: boolean;
     valueId?: number | null;
     valueIds?: number[];
-    onChangeId?: (id: number) => void;
+    onChangeId?: (id: number | null) => void;
     onChangeIds?: (ids: number[]) => void;
     getOptionLabel: (option: T) => string;
     getOptionId: (option: T) => number;
@@ -47,8 +47,8 @@ export default function BaseDeliverySelect<T>({
                 if (multiple) {
                     const ids = (newValue as T[]).map(getOptionId);
                     onChangeIds?.(ids);
-                } else if (newValue) {
-                    onChangeId?.(getOptionId(newValue as T));
+                } else {
+                    onChangeId?.(newValue ? getOptionId(newValue as T) : null);
                 }
             }}
             isOptionEqualToValue={(option, value) =>
