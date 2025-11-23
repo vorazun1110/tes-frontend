@@ -35,8 +35,8 @@ export default function DeliveryReceiveModal({
   const [submitClicked, setSubmitClicked] = useState(false);
 
   const allFuelDetails: VehicleDetail[] = useMemo(() => {
-    const truckDetails = deliveryDetail?.truck_details || [];
-    const trailerDetails = deliveryDetail?.trailer_details || [];
+    const truckDetails = deliveryDetail?.truck.details || [];
+    const trailerDetails = deliveryDetail?.trailer.details || [];
     return [...truckDetails, ...trailerDetails];
   }, [deliveryDetail]);
 
