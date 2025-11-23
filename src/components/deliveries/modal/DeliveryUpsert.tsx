@@ -66,14 +66,14 @@ export default function DeliveryFormModal({
       setToLocationIds(deliveryDetail.delivery_locations);
 
       setTruckContainers(
-        deliveryDetail.truck.details.map((d) => ({
+        deliveryDetail.truck?.details?.map((d) => ({
           containerId: d.container.id,
           fuelTypeId: d.fuel_type.id,
         }))
       );
 
       setTrailerContainers(
-        deliveryDetail.trailer.details.map((d) => ({
+        deliveryDetail.trailer?.details?.map((d) => ({
           containerId: d.container.id,
           fuelTypeId: d.fuel_type.id,
         }))
