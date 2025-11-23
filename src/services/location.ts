@@ -1,8 +1,9 @@
 import { apiGet, apiAction } from "@/lib/api";
 import { ApiResponse, Location } from "@/types/api";
 
-export async function fetchLocations(): Promise<ApiResponse<Location[]>> {
-  return await apiGet<ApiResponse<Location[]>>("/fuel-locations");
+export async function fetchLocations(type?: "from" | "to"): Promise<ApiResponse<Location[]>> {
+  const query = type ? `?type=${type}` : "";
+  return await apiGet<ApiResponse<Location[]>>(`/fuel-locations${query}`);
 }
 
 export async function updateLocation(

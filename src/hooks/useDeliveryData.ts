@@ -30,7 +30,8 @@ interface DeliveryData {
     leaveStatuses: Status[];
     managerStatuses: Status[];
     distances: Distance[];
-    fuelLocations: Location[];
+    fromLocations: Location[];
+    toLocations: Location[];
 }
 
 const swrConfig: SWRConfiguration = {
@@ -45,7 +46,8 @@ export function useDeliveryPageData(date: Dayjs): DeliverySWR {
         trailers: useSWR("trailers", fetchTrailers, swrConfig),
         fuelTypes: useSWR("fuel-types", fetchFuelTypes, swrConfig),
         distances: useSWR("distances", fetchDistances, swrConfig),
-        fuelLocations: useSWR("fuel-locations", fetchLocations, swrConfig),
+        fromLocations: useSWR("from-locations", () => fetchLocations("from"), swrConfig),
+        toLocations: useSWR("to-locations", () => fetchLocations("to"), swrConfig),
         truckStatuses: useSWR("truck-statuses", () => fetchStatuses("truck"), swrConfig),
         leaveStatuses: useSWR("leave-statuses", () => fetchStatuses("leave"), swrConfig),
         managerStatuses: useSWR("manager-statuses", () => fetchStatuses("manager"), swrConfig),

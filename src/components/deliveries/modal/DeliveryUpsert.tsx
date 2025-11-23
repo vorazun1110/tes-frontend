@@ -23,7 +23,8 @@ interface DeliveryFormModalProps {
   trucks?: Truck[];
   trailers?: Trailer[];
   fuelTypes?: FuelType[];
-  fuelLocations?: Location[];
+  fromLocations?: Location[];
+  toLocations?: Location[];
 }
 
 export default function DeliveryFormModal({
@@ -37,7 +38,8 @@ export default function DeliveryFormModal({
   trucks = [],
   trailers = [],
   fuelTypes = [],
-  fuelLocations = [],
+  fromLocations = [],
+  toLocations = [],
 }: DeliveryFormModalProps) {
   const [driverId, setDriverId] = useState<number | null>(null);
   const [fromLocationId, setFromLocationId] = useState<number>(1);
@@ -193,8 +195,8 @@ export default function DeliveryFormModal({
   };
 
   const handleSubmit = async () => {
-    const truckFuelError = truckContainers.some((c) => !c.fuelTypeId);
-    const trailerFuelError = trailerContainers.some((c) => !c.fuelTypeId);
+    const truckFuelError = truckContainers?.length > 0 && truckContainers.some((c) => !c.fuelTypeId);
+    const trailerFuelError = trailerContainers?.length > 0 && trailerContainers.some((c) => !c.fuelTypeId);
 
     const newContainerErrors: { [key: number]: boolean } = {};
     truckContainers.forEach((c) => {
@@ -259,27 +261,6 @@ export default function DeliveryFormModal({
           error={errors.driverId}
         />
 
-        <BaseDeliverySelect<Location>
-          label="Ачилт (хаанаас)"
-          options={fuelLocations}
-          valueId={fromLocationId}
-          onChangeId={(id) => handleFromLocationChange(id)}
-          getOptionLabel={(l) => `${l.name} – ${l.location}`}
-          getOptionId={(l) => l.id}
-          error={errors.fromLocationId}
-        />
-
-        <BaseDeliverySelect<Location>
-          label="Ачилт (хаашаа)"
-          options={fuelLocations}
-          valueIds={toLocationIds}
-          multiple
-          onChangeIds={(ids) => handleToLocationChange(ids)}
-          getOptionLabel={(l) => `${l.name} – ${l.location}`}
-          getOptionId={(l) => l.id}
-          error={errors.toLocationIds}
-        />
-
         <BaseDeliverySelect<Truck>
           label="Машин"
           options={trucks}
@@ -289,6 +270,29 @@ export default function DeliveryFormModal({
           getOptionId={(t) => t.id}
           error={errors.truckId}
         />
+
+        <BaseDeliverySelect<Location>
+          label="Ачилт (хаанаас)"
+          options={fromLocations}
+          valueId={fromLocationId}
+          onChangeId={(id) => handleFromLocationChange(id)}
+          getOptionLabel={(l) => `${l.name} – ${l.location}`}
+          getOptionId={(l) => l.id}
+          error={errors.fromLocationId}
+        />
+
+        <BaseDeliverySelect<Location>
+          label="Ачилт (хаашаа)"
+          options={toLocations}
+          valueIds={toLocationIds}
+          multiple
+          onChangeIds={(ids) => handleToLocationChange(ids)}
+          getOptionLabel={(l) => `${l.name} – ${l.location}`}
+          getOptionId={(l) => l.id}
+          error={errors.toLocationIds}
+        />
+
+
 
         <BaseDeliverySelect<Trailer>
           label="Чиргүүл"

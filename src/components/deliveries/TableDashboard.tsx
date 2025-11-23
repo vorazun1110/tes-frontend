@@ -77,7 +77,8 @@ export default function DeliveryDashboard() {
     leaveStatuses,
     managerStatuses,
     distances,
-    fuelLocations,
+    fromLocations,
+    toLocations,
   } = useMemo(() => data, [data]);
   const deliveries = data?.deliveries?.result;
 
@@ -272,7 +273,8 @@ export default function DeliveryDashboard() {
             trucks={trucks}
             trailers={trailers}
             fuelTypes={fuelTypes}
-            fuelLocations={fuelLocations}
+            fromLocations={fromLocations}
+            toLocations={toLocations}
           />
         ) : (
           <div className="p-6 text-sm text-gray-500">Түр хүлээнэ үү...</div>
