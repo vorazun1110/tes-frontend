@@ -1,7 +1,7 @@
 import { clearAuth, getToken } from "./auth";
 import { dispatchSnackbar } from "./snackbar";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://api.tmoiltrans.ub.mn";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.tmoiltrans.ub.mn";
 
 async function handleActionResponse<T>(response: Response): Promise<T> {
   const json = await response.json();
@@ -39,7 +39,6 @@ export async function apiGet<T>(endpoint: string): Promise<T> {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "ngrok-skip-browser-warning": "zail",
       "Authorization": `Bearer ${getToken()}`,
     },
     cache: "no-store",
