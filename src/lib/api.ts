@@ -1,7 +1,7 @@
 import { clearAuth, getToken } from "./auth";
 import { dispatchSnackbar } from "./snackbar";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://skilled-stud-merely.ngrok-free.app";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://api.tmoiltrans.ub.mn";
 
 async function handleActionResponse<T>(response: Response): Promise<T> {
   const json = await response.json();
