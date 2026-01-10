@@ -55,7 +55,6 @@ export async function apiAction<T>(
     method,
     headers: {
       "Content-Type": "application/json",
-      "ngrok-skip-browser-warning": "zail",
       "Authorization": `Bearer ${getToken()}`,
     },
     body: JSON.stringify(body),
