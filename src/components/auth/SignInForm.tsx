@@ -4,6 +4,7 @@ import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
 import Button from "@/components/ui/button/Button";
 import { EyeCloseIcon, EyeIcon } from "@/icons";
+import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -74,13 +75,24 @@ export default function SignInForm() {
     <div className="flex flex-col flex-1 lg:w-1/2 w-full">
       <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
         <div>
-          <div className="mb-5 sm:mb-8">
-            <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
-              Нэвтрэх
-            </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Системд тавтай морилно уу
-            </p>
+          <div className="mb-5 sm:mb-8 flex flex-col items-center">
+            <Link href="/" className="mb-8 inline-block">
+              <Image
+                src="/images/logo/logo.webp"
+                alt="Logo"
+                width={150}
+                height={150}
+                className="dark:invert"
+              />
+            </Link>
+            <div className="w-full">
+              <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
+                Нэвтрэх
+              </h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Системд тавтай морилно уу
+              </p>
+            </div>
           </div>
 
           <div>
