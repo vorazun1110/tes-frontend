@@ -41,9 +41,7 @@ export default function DeliveryDashboard() {
     const dateParam = searchParams.get("date");
     return dayjs(dateParam ?? dayjs().format("YYYY-MM-DD")).startOf("day");
   }, [searchParams]);
-  const [dateUrl, setDate] = useState<Dayjs>(initialDateFromUrl);
-
-  const date = useMemo(() => dayjs(dateUrl.format("YYYY-MM-DD")), [dateUrl]);
+  const [date, setDate] = useState<Dayjs>(initialDateFromUrl);
 
   // Session/User data
   const sessionUser = useSessionUser();
@@ -68,18 +66,16 @@ export default function DeliveryDashboard() {
 
   const { data, isLoading, isError, mutate } = useDeliveryPageData(date);
 
-  const {
-    drivers,
-    trucks,
-    trailers,
-    fuelTypes,
-    truckStatuses,
-    leaveStatuses,
-    managerStatuses,
-    distances,
-    fromLocations,
-    toLocations,
-  } = useMemo(() => data, [data]);
+  const drivers = data?.drivers;
+  const trucks = data?.trucks;
+  const trailers = data?.trailers;
+  const fuelTypes = data?.fuelTypes;
+  const truckStatuses = data?.truckStatuses;
+  const leaveStatuses = data?.leaveStatuses;
+  const managerStatuses = data?.managerStatuses;
+  const distances = data?.distances;
+  const fromLocations = data?.fromLocations;
+  const toLocations = data?.toLocations;
   const deliveries = data?.deliveries?.result;
 
   const openEditModal = async (deliveryId: number) => {

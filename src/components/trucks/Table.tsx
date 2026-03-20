@@ -20,6 +20,8 @@ import Pagination from "../ui/pagination";
 import Modal from "../modal/BasicModal";
 import Button from "@/components/ui/button/Button";
 import { Pencil, Trash2 } from "lucide-react";
+import { motion } from "framer-motion";
+import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import TruckFormModal from "./Modal";
 import { useConfirmDialog } from "@/hooks/useConfirmDialog";
 import ConfirmDialog from "../ui/modal/ConfirmDialog";
@@ -28,7 +30,7 @@ import { usePathname } from "next/navigation";
 
 export default function TruckTable() {
   const [trucks, setTrucks] = useState<Truck[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -44,9 +46,11 @@ export default function TruckTable() {
 
   const rowsPerPage = 10;
   useEffect(() => {
+    setLoading(true);
     fetchTrucks()
       .then((res) => setTrucks(res.data))
-      .catch((err) => setError(err.message));
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
   const filteredTrucks = useMemo(() => {
@@ -63,57 +67,39 @@ export default function TruckTable() {
   const totalPages = Math.ceil(filteredTrucks.length / rowsPerPage);
 
   const handleSubmit = async (payload: TruckPayload) => {
-    try {
-      if (editTruck) {
-        const res = await updateTruck(editTruck.id, payload);
-        setTrucks((prev) =>
-          prev.map((t) => (t.id === editTruck.id ? res.data : t)),
-        );
-      } else {
-        const res = await createTruck(payload);
-        setTrucks((prev) => [res.data, ...prev]);
-      }
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("An unknown error occurred");
-      }
-    } finally {
-      setIsModalOpen(false);
-      setEditTruck(null);
+    if (editTruck) {
+      const res = await updateTruck(editTruck.id, payload);
+      setTrucks((prev) =>
+        prev.map((t) => (t.id === editTruck.id ? res.data : t)),
+      );
+    } else {
+      const res = await createTruck(payload);
+      setTrucks((prev) => [res.data, ...prev]);
     }
+    setIsModalOpen(false);
+    setEditTruck(null);
   };
 
   const handleDelete = async (id: number) => {
-    try {
-      await deleteTruck(id);
-      setTrucks((prev) => prev.filter((t) => t.id !== id));
-    } catch (err: unknown) {
-      if (err instanceof Error) setError(err.message);
-      else setError("An unknown error occurred");
-    }
+    await deleteTruck(id);
+    setTrucks((prev) => prev.filter((t) => t.id !== id));
   };
 
   return (
-    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-700 dark:bg-white/[0.03]">
       <div className="px-4 pt-4">
         <div
           role="tablist"
           aria-label="Fuel location tabs"
-          className="flex items-center gap-2 border-b border-gray-100 dark:border-white/[0.05]"
+          className="flex items-center gap-2 border-b border-gray-300 dark:border-gray-600"
         >
           <Link
             href="/trucks"
             role="tab"
             aria-selected={pathname === "/trucks"}
-            aria-current={pathname === "/trucks" ? "page" : undefined}
             className={[
-              // layout & spacing
               "-mb-[1px] inline-flex items-center rounded-t-lg px-4 py-2 text-sm font-medium transition-colors",
-              // base colors
               "text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white",
-              // underline indicator via border
               "border-b-2",
               pathname === "/trucks"
                 ? "border-gray-900 text-gray-900 dark:border-white dark:text-white"
@@ -123,15 +109,12 @@ export default function TruckTable() {
             Ачилтын машин
           </Link>
 
-          <span className="text-gray-300 select-none dark:text-white/30">
-            |
-          </span>
+          <span className="text-gray-300 select-none dark:text-gray-600">|</span>
 
           <Link
             href="/trailers"
             role="tab"
             aria-selected={pathname === "/trailers"}
-            aria-current={pathname === "/trailers" ? "page" : undefined}
             className={[
               "-mb-[1px] inline-flex items-center rounded-t-lg px-4 py-2 text-sm font-medium transition-colors",
               "text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white",
@@ -166,188 +149,82 @@ export default function TruckTable() {
           + Нэмэх
         </Button>
       </div>
-      <div className="w-full overflow-x-auto">
-        <Table className="min-w-[1100px]">
-          <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
+      {loading ? <TableSkeleton rows={5} columns={9} /> : (
+      <>
+      <div className="w-full overflow-x-auto border-t border-gray-300 dark:border-gray-600">
+        <Table className="min-w-[900px]">
+          <TableHeader>
             <TableRow>
-              <TableCell
-                isHeader
-                rowSpan={2}
-                className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
-              >
-                #
-              </TableCell>
-              <TableCell
-                isHeader
-                rowSpan={2}
-                className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
-              >
-                Улсын дугаар
-              </TableCell>
-              <TableCell
-                isHeader
-                rowSpan={2}
-                className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
-              >
-                Жолооч
-              </TableCell>
-
-              <TableCell
-                isHeader
-                colSpan={4}
-                className="text-theme-xs px-5 py-3 text-center text-gray-500 dark:text-gray-400"
-              >
-                Багтаамж
-              </TableCell>
-
-              <TableCell
-                isHeader
-                rowSpan={2}
-                className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
-              >
-                Чиргүүл
-              </TableCell>
-
-              <TableCell
-                isHeader
-                rowSpan={2}
-                className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
-              >
-                Дугуйн гүйлт
-              </TableCell>
-              <TableCell
-                isHeader
-                rowSpan={2}
-                className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
-              >
-                Аккумулятор солих хугацаа
-              </TableCell>
-              <TableCell
-                isHeader
-                rowSpan={2}
-                className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
-              >
-                Үзлэгийн хугацаа
-              </TableCell>
-              <TableCell
-                isHeader
-                rowSpan={2}
-                className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
-              >
-                Үйлдэл
-              </TableCell>
+              <TableCell isHeader rowSpan={2} className="w-12 text-center">#</TableCell>
+              <TableCell isHeader rowSpan={2}>Улсын дугаар</TableCell>
+              <TableCell isHeader rowSpan={2}>Жолооч</TableCell>
+              <TableCell isHeader colSpan={4} className="text-center">Багтаамж</TableCell>
+              <TableCell isHeader rowSpan={2}>Чиргүүл</TableCell>
+              <TableCell isHeader rowSpan={2} className="w-24 text-center">Үйлдэл</TableCell>
             </TableRow>
-
             <TableRow>
-              <TableCell
-                isHeader
-                className="text-theme-xs px-5 py-3 text-center text-gray-500 dark:text-gray-400"
-              >
-                Лүүк 1
-              </TableCell>
-              <TableCell
-                isHeader
-                className="text-theme-xs px-5 py-3 text-center text-gray-500 dark:text-gray-400"
-              >
-                Лүүк 2
-              </TableCell>
-              <TableCell
-                isHeader
-                className="text-theme-xs px-5 py-3 text-center text-gray-500 dark:text-gray-400"
-              >
-                Лүүк 3
-              </TableCell>
-              <TableCell
-                isHeader
-                className="text-theme-xs px-5 py-3 text-center text-gray-500 dark:text-gray-400"
-              >
-                Лүүк 4
-              </TableCell>
+              <TableCell isHeader className="text-center">Лүүк 1</TableCell>
+              <TableCell isHeader className="text-center">Лүүк 2</TableCell>
+              <TableCell isHeader className="text-center">Лүүк 3</TableCell>
+              <TableCell isHeader className="text-center">Лүүк 4</TableCell>
             </TableRow>
           </TableHeader>
 
-          <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05] dark:text-white">
-            {paginatedTrucks.map((truck, index) => {
-              return (
-                <TableRow key={truck.id} className="hover:bg-gray-100">
-                  <TableCell className="text-theme-sm px-5 py-4 text-start">
-                    {(currentPage - 1) * rowsPerPage + index + 1}
-                  </TableCell>
-                  <TableCell className="text-theme-sm px-5 py-4 text-start">
-                    {truck.license_plate}
-                  </TableCell>
-                  <TableCell className="text-theme-sm px-5 py-4 text-start">
-                    {truck.driver?.firstname || ""}{" "}
-                    {truck.driver?.lastname || ""}
-                  </TableCell>
-                  <TableCell className="text-theme-sm px-5 py-4 text-start">
-                    {truck.containers[0]?.volume || "-"}
-                  </TableCell>
-                  <TableCell className="text-theme-sm px-5 py-4 text-start">
-                    {truck.containers[1]?.volume || "-"}
-                  </TableCell>
-                  <TableCell className="text-theme-sm px-5 py-4 text-start">
-                    {truck.containers[2]?.volume || "-"}
-                  </TableCell>
-                  <TableCell className="text-theme-sm px-5 py-4 text-start">
-                    {truck.containers[3]?.volume || "-"}
-                  </TableCell>
-                  <TableCell className="text-theme-sm px-5 py-4 text-start">
-                    {truck.trailer?.license_plate || "-"}
-                  </TableCell>
-                  <TableCell className="text-theme-sm px-5 py-4 text-start">
-                    {truck.tire_wear || "-"}
-                  </TableCell>
-                  <TableCell className="text-theme-sm px-5 py-4 text-start">
-                    {truck.last_battery_changed_at || "-"}
-                  </TableCell>
-                  <TableCell className="text-theme-sm px-5 py-4 text-start">
-                    {truck.last_inspected_at || "-"}
-                  </TableCell>
-                  <TableCell className="text-theme-sm px-5 py-4 text-start">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => {
-                          setEditTruck(truck);
-                          setIsModalOpen(true);
-                        }}
-                        className="text-blue-600 hover:text-blue-800"
-                      >
-                        <Pencil size={18} />
-                      </button>
-                      <button
-                        onClick={() => {
-                          openConfirm(() => handleDelete(truck.id), {
-                            title: "Мэдээлэл устгах",
-                            description: `"${truck.license_plate}" дугаартай машиныг устгах уу?`,
-                            confirmText: "Устгах",
-                            cancelText: "Цуцлах",
-                          });
-                        }}
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+          <TableBody>
+            {paginatedTrucks.map((truck, index) => (
+              <TableRow key={truck.id} className="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
+                <TableCell className="text-center font-medium text-gray-500">
+                  {(currentPage - 1) * rowsPerPage + index + 1}
+                </TableCell>
+                <TableCell className="font-medium">{truck.license_plate}</TableCell>
+                <TableCell>
+                  {truck.driver?.firstname || ""} {truck.driver?.lastname || ""}
+                </TableCell>
+                <TableCell className="text-center">{truck.containers[0]?.volume || "-"}</TableCell>
+                <TableCell className="text-center">{truck.containers[1]?.volume || "-"}</TableCell>
+                <TableCell className="text-center">{truck.containers[2]?.volume || "-"}</TableCell>
+                <TableCell className="text-center">{truck.containers[3]?.volume || "-"}</TableCell>
+                <TableCell>{truck.trailer?.license_plate || "-"}</TableCell>
+                <TableCell className="text-center">
+                  <div className="flex justify-center gap-2">
+                    <button
+                      onClick={() => {
+                        setEditTruck(truck);
+                        setIsModalOpen(true);
+                      }}
+                      className="p-1.5 rounded-md text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                    >
+                      <Pencil size={16} />
+                    </button>
+                    <button
+                      onClick={() => {
+                        openConfirm(() => handleDelete(truck.id), {
+                          title: "Мэдээлэл устгах",
+                          description: `"${truck.license_plate}" дугаартай машиныг устгах уу?`,
+                          confirmText: "Устгах",
+                          cancelText: "Цуцлах",
+                        });
+                      }}
+                      className="p-1.5 rounded-md text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
-        {error && (
-          <div className="p-4 text-sm font-medium text-red-500">
-            Error: {error}
-          </div>
-        )}
-        <div className="flex justify-end p-4">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
-        </div>
       </div>
+      <div className="flex justify-end p-4 border-t border-gray-300 dark:border-gray-600">
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      </div>
+      </>
+      )}
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <TruckFormModal
@@ -362,6 +239,6 @@ export default function TruckTable() {
         onConfirm={confirmDelete}
         {...confirmOptions}
       />
-    </div>
+    </motion.div>
   );
 }

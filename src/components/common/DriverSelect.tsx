@@ -3,14 +3,14 @@
 import { fetchDrivers } from "@/services/driver";
 import { Driver } from "@/types/api";
 import React, { useEffect, useMemo, useState } from "react";
-import Select, { SingleValue } from "react-select";
+import { Autocomplete, TextField } from "@mui/material";
 
 interface DriverSelectProps {
   value?: number | string | null;
   onChange: (id: number) => void;
 }
 
-type Option = { value: number | string; label: string };
+type Option = { value: number; label: string };
 
 export default function DriverSelect({ value, onChange }: DriverSelectProps) {
   const [drivers, setDrivers] = useState<Driver[]>([]);
@@ -22,13 +22,8 @@ export default function DriverSelect({ value, onChange }: DriverSelectProps) {
       try {
         setLoading(true);
         const res = await fetchDrivers();
-
-        const list = res.data || [];
-        if (res.success) {
-          setDrivers(list);
-        } else {
-          setError("Алдаа гарлаа");
-        }
+        if (res.success) setDrivers(res.data || []);
+        else setError("Алдаа гарлаа");
       } catch {
         setError("Серверээс мэдээлэл авахад алдаа гарлаа");
       } finally {
@@ -39,83 +34,43 @@ export default function DriverSelect({ value, onChange }: DriverSelectProps) {
   }, []);
 
   const options = useMemo<Option[]>(
-    () =>
-      drivers.map((d) => ({
-        value: d.id,
-        label: `${d.firstname} ${d.lastname}`,
-      })),
+    () => drivers.map((d) => ({ value: d.id, label: `${d.firstname} ${d.lastname}` })),
     [drivers],
   );
 
   const selectedOption = useMemo<Option | null>(() => {
-    if (
-      value === undefined ||
-      value === null ||
-      value === "" ||
-      options.length === 0
-    ) {
-      return null;
-    }
-    const valStr = String(value);
-    return options.find((o) => String(o.value) === valStr) ?? null;
+    if (value === undefined || value === null || value === "" || options.length === 0) return null;
+    return options.find((o) => String(o.value) === String(value)) ?? null;
   }, [options, value]);
-
-  const handleChange = (opt: SingleValue<Option>) => {
-    if (opt?.value !== undefined && opt?.value !== null) {
-      const n = Number(opt.value);
-      onChange(Number.isFinite(n) ? n : 0);
-    } else {
-      onChange(0);
-    }
-  };
 
   return (
     <div>
-      <label
-        htmlFor="driver"
-        className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
-      >
-        Жолооч
-      </label>
-
-      <Select
-        key={`${options.length}-${String(value ?? "")}`}
-        inputId="driver"
-        value={selectedOption}
-        onChange={handleChange}
+      <Autocomplete
+        size="small"
         options={options}
-        getOptionValue={(option) => String(option.value)}
-        getOptionLabel={(option) => String(option.label)}
-        placeholder={
-          loading ? "Уншиж байна..." : error ? "Алдаа..." : "Сонгох..."
-        }
-        isClearable
-        isSearchable
-        isDisabled={loading || !!error}
-        className="text-sm"
-        classNames={{
-          control: () =>
-            "h-11 w-full rounded-lg border border-gray-300 bg-transparent dark:border-gray-700 dark:bg-gray-900 dark:text-white",
-          menu: () => "dark:bg-gray-900 dark:text-white",
+        value={selectedOption}
+        onChange={(_, opt) => onChange(opt?.value ?? 0)}
+        getOptionLabel={(o) => o.label}
+        isOptionEqualToValue={(a, b) => a.value === b.value}
+        loading={loading}
+        disabled={!!error}
+        noOptionsText="Олдсонгүй"
+        loadingText="Уншиж байна..."
+        slotProps={{
+          popper: { style: { zIndex: 99999 } },
         }}
-        styles={{
-          control: (base) => ({
-            ...base,
-            backgroundColor: "transparent",
-            borderColor: "#d1d5db",
-          }),
-          input: (base) => ({
-            ...base,
-            color: "inherit",
-          }),
-          singleValue: (base) => ({
-            ...base,
-            color: "inherit",
-          }),
-        }}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Жолооч"
+            error={!!error}
+            helperText={error || ""}
+            sx={{
+              "& .MuiInputBase-root": { height: 44, borderRadius: "0.5rem" },
+            }}
+          />
+        )}
       />
-
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
     </div>
   );
 }

@@ -38,18 +38,24 @@ export default function TrailerFormModal({ editTrailer, onClose, onSubmit }: Tra
     setContainers((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const [loading, setLoading] = useState(false);
+
   const handleSubmit = async () => {
     const payload: TrailerPayload = {
       license_plate: licensePlate,
       containers: containers.map((c) => ({ volume: c.volume || 0 })),
     };
-    await onSubmit(payload);
-    onClose();
+    setLoading(true);
+    try {
+      await onSubmit(payload);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold text-white">
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
         {editTrailer ? "Чиргүүл засах" : "Чиргүүл нэмэх"}
       </h2>
 
@@ -96,7 +102,7 @@ export default function TrailerFormModal({ editTrailer, onClose, onSubmit }: Tra
 
         <div className="flex justify-end gap-2 mt-6">
           <Button variant="outline" onClick={onClose}>Болих</Button>
-          <Button onClick={handleSubmit}>{editTrailer ? "Засах" : "Нэмэх"}</Button>
+          <Button onClick={handleSubmit} disabled={loading}>{loading ? "Түр хүлээнэ үү..." : editTrailer ? "Засах" : "Нэмэх"}</Button>
         </div>
       </div>
     </div>

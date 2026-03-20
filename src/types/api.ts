@@ -107,8 +107,10 @@ export interface Location {
 
 export interface LocationPayload {
   name: string;
-  latitude: number;
-  longitude: number;
+  location?: string;
+  district?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface Distance {
@@ -217,38 +219,48 @@ export interface ReceiverDetail {
   name: string;
 }
 
-export interface DeliveryItem {
+export interface ReportReceiver {
+  id: number;
+  firstname: string;
+  lastname: string;
+}
+
+export interface ReportLocationDetail {
+  id: number;
+  name: string;
+  mass: number;
+  volume: number;
+  averageDensity: number;
   locationDetail: LocationDetail | null;
-  receiverDetail: ReceiverDetail | null;
-  deliveryTruck: Vehicle;
-  deliveryTrailer: Vehicle;
+  receivers: ReportReceiver[];
+}
+
+export interface ReportFuelDetail {
+  id: number;
+  name: string;
+  locations: ReportLocationDetail[];
+}
+
+export interface ReportDeliveryItem {
+  truck: Vehicle | null;
+  trailer: Vehicle | null;
+  driver: { id: number; firstname: string; lastname: string } | null;
   tonKm: number;
   withLoadDistance: number;
   withoutLoadDistance: number;
-  details: FuelDetail[];
+  details: ReportFuelDetail[];
   date?: string;
 }
 
-export interface GroupedDelivery {
+export interface ReportGroupedDelivery {
   date: string;
-  deliveries: DeliveryItem[];
-}
-
-export interface ReportData {
-  totalMass: number;
-  totalTonKm: number;
-  totalVolume: number;
-  totalDistance: number;
-  totalWithLoadDistance: number;
-  totalWithoutLoadDistance: number;
-  totalFuelTypeDetail: FuelTypeSummary[];
-  deliveries: GroupedDelivery[];
+  deliveries: ReportDeliveryItem[];
 }
 
 export interface ReportResponse {
   message: string;
   success: boolean;
-  data: ReportData;
+  data: ReportGroupedDelivery[];
 }
 
 export interface ReportMeta {

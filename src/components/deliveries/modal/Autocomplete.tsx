@@ -70,7 +70,7 @@ export default function BaseDeliverySelect<T>({
             )}
             slotProps={{
                 popper: {
-                    disablePortal: true,
+                    style: { zIndex: 99999 },
                 },
             }}
         />

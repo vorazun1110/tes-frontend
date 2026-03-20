@@ -35,6 +35,8 @@ export default function DriverFormModal({ editDriver, onClose, onSubmit }: Drive
     }
   }, [editDriver]);
 
+  const [loading, setLoading] = useState(false);
+
   const handleSubmit = async () => {
     const payload: DriverPayload = {
       id: editDriver?.id || 0,
@@ -44,13 +46,17 @@ export default function DriverFormModal({ editDriver, onClose, onSubmit }: Drive
       register: register,
       phone: phone,
     };
-    await onSubmit(payload);
-    onClose();
+    setLoading(true);
+    try {
+      await onSubmit(payload);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold text-black">
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
         {editDriver ? "Жолооч засах" : "Жолооч нэмэх"}
       </h2>
 
@@ -110,7 +116,7 @@ export default function DriverFormModal({ editDriver, onClose, onSubmit }: Drive
       </div>
       <div className="flex justify-end gap-2 mt-6">
         <Button variant="outline" onClick={onClose}>Болих</Button>
-        <Button onClick={handleSubmit}>{editDriver ? "Засах" : "Нэмэх"}</Button>
+        <Button onClick={handleSubmit} disabled={loading}>{loading ? "Түр хүлээнэ үү..." : editDriver ? "Засах" : "Нэмэх"}</Button>
       </div>
     </div>
   );

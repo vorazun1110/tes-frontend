@@ -36,6 +36,8 @@ export default function UserFormModal({ editUser, onClose, onSubmit }: UserFormM
     }
   }, [editUser]);
 
+  const [loading, setLoading] = useState(false);
+
   const handleSubmit = async () => {
     const payload: UserPayload = {
       username: username,
@@ -44,13 +46,17 @@ export default function UserFormModal({ editUser, onClose, onSubmit }: UserFormM
       firstname: firstname,
       lastname: lastname,
     };
-    await onSubmit(payload);
-    onClose();
+    setLoading(true);
+    try {
+      await onSubmit(payload);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold text-white">
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
         {editUser ? "Хэрэглэгчийн засах" : "Хэрэглэгчийн нэмэх"}
       </h2>
 
@@ -107,7 +113,7 @@ export default function UserFormModal({ editUser, onClose, onSubmit }: UserFormM
       </div>
       <div className="flex justify-end gap-2 mt-6">
         <Button variant="outline" onClick={onClose}>Болих</Button>
-        <Button onClick={handleSubmit}>{editUser ? "Засах" : "Нэмэх"}</Button>
+        <Button onClick={handleSubmit} disabled={loading}>{loading ? "Түр хүлээнэ үү..." : editUser ? "Засах" : "Нэмэх"}</Button>
       </div>
     </div>
   );

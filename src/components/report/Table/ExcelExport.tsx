@@ -3,47 +3,30 @@
 import React from "react";
 import { saveAs } from "file-saver";
 import ExcelJS from "exceljs";
-import { DeliveryItem } from "@/types/api";
+import { ReportGroupedDelivery } from "@/types/api";
 import Button from "@/components/ui/button/Button";
 
 interface Props {
-  deliveries: DeliveryItem[];
+  data: ReportGroupedDelivery[];
 }
 
-export default function ReportExcelExport({ deliveries }: Props) {
+export default function ReportExcelExport({ data }: Props) {
   const exportToExcel = async () => {
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet("Тайлан");
 
-    // ---------------------------
-    // 1️⃣ Header Rows
-    // ---------------------------
     const headerRow1 = sheet.addRow([
-      "№",
-      "Огноо",
-      "Шатахууны марк",
-      "Ачааны хэмжээ",
-      "",
-      "",
-      "Явсан зам (км)",
-      "",
-      "Тонн/км",
-      "Хаана буусан",
-      "Хүлээн авсан хүний нэр, гарын үсэг",
+      "№", "Огноо", "Шатахууны марк",
+      "Ачааны хэмжээ", "", "",
+      "Явсан зам (км)", "",
+      "Тонн/км", "Хаана буусан", "Хүлээн авсан",
     ]);
 
     const headerRow2 = sheet.addRow([
-      "",
-      "",
-      "",
-      "%-ийн жин",
-      "Литр",
-      "Нийт жин",
-      "Ачаатай",
-      "Сул",
-      "",
-      "",
-      "",
+      "", "", "",
+      "%-ийн жин", "Литр", "Нийт жин",
+      "Ачаатай", "Сул",
+      "", "", "",
     ]);
 
     sheet.mergeCells("A1:A2");
@@ -57,58 +40,57 @@ export default function ReportExcelExport({ deliveries }: Props) {
 
     [headerRow1, headerRow2].forEach((row) => {
       row.font = { bold: true };
-      row.alignment = {
-        horizontal: "center",
-        vertical: "middle",
-        wrapText: true,
-      };
+      row.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
     });
 
-    // ---------------------------
-    // 2️⃣ Data Rows with Row Merge
-    // ---------------------------
     let currentRow = 3;
+    let deliveryIdx = 0;
 
-    deliveries.forEach((delivery, deliveryIdx) => {
-      const rowSpan = delivery.details.length || 1;
-
-      delivery.details.forEach((detail) => {
-        sheet.addRow([
-          deliveryIdx + 1, // A
-          delivery.date,   // B
-          detail.name ?? "-",             // C
-          detail.averageDensity ?? "-",   // D
-          detail.volume ?? 0,             // E
-          detail.mass ?? 0,               // F
-          delivery.withLoadDistance ?? 0,     // G
-          delivery.withoutLoadDistance ?? 0,  // H
-          delivery.tonKm ?? 0,                // I
-          delivery.locationDetail?.name ?? "-",  // J
-          delivery.receiverDetail?.name ?? "-",  // K
-        ]);
-      });
-
-      // Vertically merge fields for rowspan simulation
-      const startRow = currentRow;
-      const endRow = currentRow + rowSpan - 1;
-
-      const columnsToMerge = ["A", "B", "G", "H", "I", "J", "K"];
-      for (const col of columnsToMerge) {
-        if (rowSpan > 1) {
-          sheet.mergeCells(`${col}${startRow}:${col}${endRow}`);
+    for (const group of data) {
+      for (const delivery of group.deliveries) {
+        let totalRows = 0;
+        for (const detail of delivery.details) {
+          totalRows += Math.max(detail.locations.length, 1);
         }
+        if (totalRows === 0) totalRows = 1;
+
+        for (const detail of delivery.details) {
+          if (detail.locations.length === 0) {
+            sheet.addRow([
+              deliveryIdx + 1, group.date, detail.name,
+              "-", 0, 0,
+              delivery.withLoadDistance, delivery.withoutLoadDistance,
+              delivery.tonKm, "-", "-",
+            ]);
+          } else {
+            for (const loc of detail.locations) {
+              sheet.addRow([
+                deliveryIdx + 1, group.date, detail.name,
+                loc.averageDensity, loc.volume, loc.mass,
+                delivery.withLoadDistance, delivery.withoutLoadDistance,
+                delivery.tonKm,
+                loc.locationDetail?.name || loc.name || "-",
+                loc.receivers?.map(r => `${r.lastname} ${r.firstname}`).join(", ") || "-",
+              ]);
+            }
+          }
+        }
+
+        const startRow = currentRow;
+        const endRow = currentRow + totalRows - 1;
+        const columnsToMerge = ["A", "B", "G", "H", "I"];
+        for (const col of columnsToMerge) {
+          if (totalRows > 1) {
+            sheet.mergeCells(`${col}${startRow}:${col}${endRow}`);
+          }
+        }
+
+        currentRow += totalRows;
+        deliveryIdx++;
       }
+    }
 
-      currentRow += rowSpan;
-    });
-
-    // ---------------------------
-    // 3️⃣ Style Formatting
-    // ---------------------------
-    sheet.columns.forEach((col) => {
-      col.width = 16;
-    });
-
+    sheet.columns.forEach((col) => { col.width = 16; });
     sheet.eachRow((row) => {
       row.eachCell((cell) => {
         cell.border = {
@@ -121,16 +103,11 @@ export default function ReportExcelExport({ deliveries }: Props) {
       });
     });
 
-    // ---------------------------
-    // 4️⃣ Export File
-    // ---------------------------
     const buffer = await workbook.xlsx.writeBuffer();
     saveAs(new Blob([buffer]), `Report_${new Date().toISOString()}.xlsx`);
   };
 
   return (
-    <div className="mb-4 text-right">
-      <Button onClick={exportToExcel}>Excel татах</Button>
-    </div>
+    <Button onClick={exportToExcel}>Excel татах</Button>
   );
 }

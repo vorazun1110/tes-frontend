@@ -96,6 +96,8 @@ export default function DistanceFormModal({
     );
   }, [name, distance, distanceNumber, location1, location2, sameLocation]);
 
+  const [loading, setLoading] = useState(false);
+
   const handleSubmit = async () => {
     const payload: DistancePayload = {
       name: name.trim(),
@@ -103,13 +105,17 @@ export default function DistanceFormModal({
       locationId1: Number(location1),
       locationId2: Number(location2),
     };
-    await onSubmit(payload);
-    onClose();
+    setLoading(true);
+    try {
+      await onSubmit(payload);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold text-white">
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
         {editDistance ? "Зай засах" : "Зай нэмэх"}
       </h2>
 
@@ -174,8 +180,8 @@ export default function DistanceFormModal({
         <Button variant="outline" onClick={onClose}>
           Болих
         </Button>
-        <Button onClick={handleSubmit} disabled={!canSubmit}>
-          {editDistance ? "Засах" : "Нэмэх"}
+        <Button onClick={handleSubmit} disabled={!canSubmit || loading}>
+          {loading ? "Түр хүлээнэ үү..." : editDistance ? "Засах" : "Нэмэх"}
         </Button>
       </div>
     </div>

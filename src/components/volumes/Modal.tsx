@@ -23,18 +23,24 @@ export default function VolumeFormModal({ editVolume, onClose, onSubmit }: Volum
     }
   }, [editVolume]);
 
+  const [loading, setLoading] = useState(false);
+
   const handleSubmit = async () => {
     const payload: Volume = {
       id: editVolume?.id || 0,
       value: parseInt(value),
     };
-    await onSubmit(payload);
-    onClose();
+    setLoading(true);
+    try {
+      await onSubmit(payload);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold text-white">
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
         {editVolume ? "Утга засах" : "Утга нэмэх"}
       </h2>
 
@@ -52,7 +58,7 @@ export default function VolumeFormModal({ editVolume, onClose, onSubmit }: Volum
       </div>
       <div className="flex justify-end gap-2 mt-6">
         <Button variant="outline" onClick={onClose}>Болих</Button>
-        <Button onClick={handleSubmit}>{editVolume ? "Засах" : "Нэмэх"}</Button>
+        <Button onClick={handleSubmit} disabled={loading}>{loading ? "Түр хүлээнэ үү..." : editVolume ? "Засах" : "Нэмэх"}</Button>
       </div>
     </div>
   );

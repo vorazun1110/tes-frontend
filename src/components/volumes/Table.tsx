@@ -9,12 +9,13 @@ import {
   TableRow,
 } from "../ui/table";
 import { Volume } from "@/types/api";
-import Badge from "../ui/badge/Badge";
 import { Input } from "../ui/input";
 import Pagination from "../ui/pagination";
 import Modal from "../modal/BasicModal";
 import Button from "@/components/ui/button/Button";
 import { Pencil, Trash2 } from "lucide-react";
+import { motion } from "framer-motion";
+import TableSkeleton from "@/components/ui/table/TableSkeleton";
 import { useConfirmDialog } from "@/hooks/useConfirmDialog";
 import ConfirmDialog from "../ui/modal/ConfirmDialog";
 import {
@@ -27,7 +28,7 @@ import VolumeFormModal from "./Modal";
 
 export default function VolumeTable() {
   const [volumes, setVolumes] = useState<Volume[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -43,9 +44,11 @@ export default function VolumeTable() {
   const rowsPerPage = 10;
 
   useEffect(() => {
+    setLoading(true);
     fetchVolumes()
       .then((res) => setVolumes(res.data))
-      .catch((err) => setError(err.message));
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
   const filteredVolumes = useMemo(() => {
@@ -60,40 +63,26 @@ export default function VolumeTable() {
   const totalPages = Math.ceil(filteredVolumes.length / rowsPerPage);
 
   const handleSubmit = async (payload: Volume) => {
-    try {
-      if (editVolume) {
-        const res = await updateVolume(editVolume.id, payload);
-        setVolumes((prev) =>
-          prev.map((d) => (d.id === editVolume.id ? res.data : d)),
-        );
-      } else {
-        const res = await createVolume(payload);
-        setVolumes((prev) => [res.data, ...prev]);
-      }
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("An unknown error occurred");
-      }
-    } finally {
-      setIsModalOpen(false);
-      setEditVolume(null);
+    if (editVolume) {
+      const res = await updateVolume(editVolume.id, payload);
+      setVolumes((prev) =>
+        prev.map((d) => (d.id === editVolume.id ? res.data : d)),
+      );
+    } else {
+      const res = await createVolume(payload);
+      setVolumes((prev) => [res.data, ...prev]);
     }
+    setIsModalOpen(false);
+    setEditVolume(null);
   };
 
   const handleDelete = async (id: number) => {
-    try {
-      await deleteVolume(id);
-      setVolumes((prev) => prev.filter((d) => d.id !== id));
-    } catch (err: unknown) {
-      if (err instanceof Error) setError(err.message);
-      else setError("An unknown error occurred");
-    }
+    await deleteVolume(id);
+    setVolumes((prev) => prev.filter((d) => d.id !== id));
   };
 
   return (
-    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="overflow-hidden rounded-xl border border-gray-300 bg-white dark:border-gray-600 dark:bg-white/[0.03]">
       <div className="flex items-center justify-between p-4">
         <Input
           type="text"
@@ -115,53 +104,44 @@ export default function VolumeTable() {
           + Нэмэх
         </Button>
       </div>
-      <div className="max-w-full overflow-x-auto">
+      {loading ? <TableSkeleton rows={5} columns={3} /> : (
+      <>
+      <div className="max-w-full overflow-x-auto border-t border-gray-300 dark:border-gray-600">
         <div className="min-w-[800px]">
           <Table>
-            <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
+            <TableHeader>
               <TableRow>
-                <TableCell
-                  isHeader
-                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
-                >
+                <TableCell isHeader className="w-12 text-center">
                   #
                 </TableCell>
-                <TableCell
-                  isHeader
-                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
-                >
+                <TableCell isHeader>
                   Утга
                 </TableCell>
-                <TableCell
-                  isHeader
-                  className="text-theme-xs px-5 py-3 text-start text-gray-500 dark:text-gray-400"
-                >
+                <TableCell isHeader className="w-24 text-center">
                   Үйлдэл
                 </TableCell>
               </TableRow>
             </TableHeader>
-            <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+            <TableBody>
               {paginatedVolumes.map((volume, index) => {
                 return (
-                  <TableRow key={volume.id} className="hover:bg-gray-100">
-                    <TableCell className="text-theme-sm px-5 py-4 text-start">
-                      <Badge color="primary">
-                        {(currentPage - 1) * rowsPerPage + index + 1}
-                      </Badge>
+                  <TableRow key={volume.id} className="hover:bg-gray-50 dark:hover:bg-white/[0.02]">
+                    <TableCell className="text-center font-medium text-gray-500">
+                      {(currentPage - 1) * rowsPerPage + index + 1}
                     </TableCell>
-                    <TableCell className="text-theme-sm px-5 py-4 text-start">
-                      <Badge color="primary">{volume.value}</Badge>
+                    <TableCell className="font-medium">
+                      {volume.value}
                     </TableCell>
-                    <TableCell className="text-theme-sm px-5 py-4 text-start">
-                      <div className="flex gap-2">
+                    <TableCell>
+                      <div className="flex justify-center gap-2">
                         <button
                           onClick={() => {
                             setEditVolume(volume);
                             setIsModalOpen(true);
                           }}
-                          className="text-blue-600 hover:text-blue-800"
+                          className="p-1.5 rounded-md text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
                         >
-                          <Pencil size={18} />
+                          <Pencil size={16} />
                         </button>
                         <button
                           onClick={() => {
@@ -172,9 +152,9 @@ export default function VolumeTable() {
                               cancelText: "Цуцлах",
                             });
                           }}
-                          className="text-red-600 hover:text-red-800"
+                          className="p-1.5 rounded-md text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                         >
-                          <Trash2 size={18} />
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </TableCell>
@@ -183,12 +163,7 @@ export default function VolumeTable() {
               })}
             </TableBody>
           </Table>
-          {error && (
-            <div className="p-4 text-sm font-medium text-red-500">
-              Error: {error}
-            </div>
-          )}
-          <div className="flex justify-end p-4">
+          <div className="flex justify-end p-4 border-t border-gray-300 dark:border-gray-600">
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
@@ -197,6 +172,8 @@ export default function VolumeTable() {
           </div>
         </div>
       </div>
+      </>
+      )}
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <VolumeFormModal
@@ -211,6 +188,6 @@ export default function VolumeTable() {
         onConfirm={confirmDelete}
         {...confirmOptions}
       />
-    </div>
+    </motion.div>
   );
 }

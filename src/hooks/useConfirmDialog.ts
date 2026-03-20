@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 export interface ConfirmDialogOptions {
   title?: string;
@@ -9,23 +9,24 @@ export interface ConfirmDialogOptions {
 
 export function useConfirmDialog() {
   const [isOpen, setIsOpen] = useState(false);
-  const [onConfirm, setOnConfirm] = useState<() => void>(() => { });
   const [options, setOptions] = useState<ConfirmDialogOptions>({});
+  const onConfirmRef = useRef<() => void>(() => {});
 
   const confirm = useCallback(
-    (onConfirmCallback: () => void, options?: ConfirmDialogOptions) => {
-      setOptions(options || {});
-      setOnConfirm(() => onConfirmCallback);
+    (onConfirmCallback: () => void, opts?: ConfirmDialogOptions) => {
+      onConfirmRef.current = onConfirmCallback;
+      setOptions(opts || {});
       setIsOpen(true);
     },
     []
   );
 
-  const handleClose = () => setIsOpen(false);
-  const handleConfirm = () => {
-    onConfirm();
-    handleClose();
-  };
+  const handleClose = useCallback(() => setIsOpen(false), []);
+
+  const handleConfirm = useCallback(() => {
+    onConfirmRef.current();
+    setIsOpen(false);
+  }, []);
 
   return {
     isOpen,

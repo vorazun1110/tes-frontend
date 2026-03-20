@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import Label from "../form/Label";
-import Select, { SingleValue } from "react-select";
+import { Autocomplete, TextField } from "@mui/material";
 import { Trailer } from "@/types/api";
 import { fetchTrailers } from "@/services/trailer";
 
@@ -12,13 +11,9 @@ interface TrailerSelectProps {
   id?: string;
 }
 
-type Option = { value: number | string; label: string };
+type Option = { value: number; label: string };
 
-export default function TrailerSelect({
-  value,
-  onChange,
-  id = "trailer",
-}: TrailerSelectProps) {
+export default function TrailerSelect({ value, onChange, id = "trailer" }: TrailerSelectProps) {
   const [trailers, setTrailers] = useState<Trailer[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -38,9 +33,7 @@ export default function TrailerSelect({
       }
     };
     load();
-    return () => {
-      mounted = false;
-    };
+    return () => { mounted = false; };
   }, []);
 
   const options = useMemo<Option[]>(
@@ -49,66 +42,37 @@ export default function TrailerSelect({
   );
 
   const selectedOption = useMemo<Option | null>(() => {
-    if (
-      value === undefined ||
-      value === null ||
-      value === 0 ||
-      options.length === 0
-    )
-      return null;
-    const valStr = String(value);
-    return options.find((o) => String(o.value) === valStr) ?? null;
+    if (!value || options.length === 0) return null;
+    return options.find((o) => o.value === value) ?? null;
   }, [options, value]);
 
-  const handleChange = (opt: SingleValue<Option>) => {
-    if (opt?.value !== undefined && opt?.value !== null) {
-      const n = Number(opt.value);
-      onChange(Number.isFinite(n) ? n : 0);
-    } else onChange(0);
-  };
-
   return (
-    <div>
-      <Label htmlFor={id}>Чиргүүл</Label>
-
-      <Select
-        key={`${options.length}-${String(value ?? "")}`}
-        inputId={id}
-        value={selectedOption}
-        onChange={handleChange}
-        options={options}
-        getOptionValue={(option) => String(option.value)}
-        getOptionLabel={(option) => String(option.label)}
-        placeholder={
-          loading ? "Уншиж байна..." : error ? "Алдаа..." : "Сонгохгүй"
-        }
-        isClearable
-        isSearchable
-        isDisabled={loading || !!error}
-        className="text-sm"
-        classNames={{
-          control: () =>
-            "h-11 w-full rounded-lg border border-gray-300 bg-transparent dark:border-gray-700 dark:bg-gray-900 dark:text-white",
-          menu: () => "dark:bg-gray-900 dark:text-white",
-        }}
-        styles={{
-          control: (base) => ({
-            ...base,
-            backgroundColor: "transparent",
-            borderColor: "#d1d5db",
-          }),
-          input: (base) => ({
-            ...base,
-            color: "inherit",
-          }),
-          singleValue: (base) => ({
-            ...base,
-            color: "inherit",
-          }),
-        }}
-      />
-
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
-    </div>
+    <Autocomplete
+      id={id}
+      size="small"
+      options={options}
+      value={selectedOption}
+      onChange={(_, opt) => onChange(opt?.value ?? 0)}
+      getOptionLabel={(o) => o.label}
+      isOptionEqualToValue={(a, b) => a.value === b.value}
+      loading={loading}
+      disabled={!!error}
+      noOptionsText="Олдсонгүй"
+      loadingText="Уншиж байна..."
+      slotProps={{
+        popper: { style: { zIndex: 99999 } },
+      }}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          label="Чиргүүл"
+          error={!!error}
+          helperText={error || ""}
+          sx={{
+            "& .MuiInputBase-root": { height: 44, borderRadius: "0.5rem" },
+          }}
+        />
+      )}
+    />
   );
 }
